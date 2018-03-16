@@ -110,11 +110,15 @@ OverviewPage::OverviewPage(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->frameDarksend->setVisible(true);  // Hide darksend features
+    ui->frameDarksend->setVisible(false);  // Hide darksend features
 
     QScroller::grabGesture(ui->scrollArea, QScroller::LeftMouseButtonGesture);
     ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    ui->columnTwoWidget->setContentsMargins(0,0,0,0);
+    ui->columnTwoWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    ui->columnTwoWidget->setMinimumWidth(300);
 
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
@@ -135,7 +139,7 @@ OverviewPage::OverviewPage(QWidget *parent) :
 
     if(fLiteMode){
         ui->frameDarksend->setVisible(false);
-    } else {
+    } else if(!fMasterNode) {
 	qDebug() << "Dark Send Status Timer";
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(darkSendStatus()));
@@ -174,6 +178,7 @@ void OverviewPage::handleTransactionClicked(const QModelIndex &index)
 
 OverviewPage::~OverviewPage()
 {
+    if(!fLiteMode && !fMasterNode) disconnect(timer, SIGNAL(timeout()), this, SLOT(darkSendStatus()));
     delete ui;
 }
 
@@ -312,7 +317,7 @@ void OverviewPage::updateDarksendProgress()
     float denomPart = 0;
     if(denominatedBalance > 0)
     {
-        denomPart = (float)pwalletMain->GetNormalizedAnonymizedBalance() / pwalletMain->GetDenominatedBalance();
+        denomPart = (float)pwalletMain->GetNormalizedAnonymizedBalance() / denominatedBalance;
         denomPart = denomPart > 1 ? 1 : denomPart;
     }
 
@@ -391,10 +396,12 @@ void OverviewPage::darkSendStatus()
     /* ** @TODO this string creation really needs some clean ups ---vertoe ** */
     std::ostringstream convert;
 
-    if(state == POOL_STATUS_ACCEPTING_ENTRIES) {
+    if(state == POOL_STATUS_IDLE) {
+        convert << tr("Darksend is idle.").toStdString();
+    } else if(state == POOL_STATUS_ACCEPTING_ENTRIES) {
         if(entries == 0) {
             if(darkSendPool.strAutoDenomResult.size() == 0){
-                convert << tr("Darksend is idle.").toStdString();
+                convert << tr("Mixing in progress...").toStdString();
             } else {
                 convert << darkSendPool.strAutoDenomResult;
             }

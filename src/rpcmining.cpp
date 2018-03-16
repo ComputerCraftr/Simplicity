@@ -127,9 +127,11 @@ Value getstakinginfo(const Array& params, bool fHelp)
 
     uint64_t nNetworkWeight = GetPoSKernelPS();
     bool staking = nLastCoinStakeSearchInterval && nWeight;
-
-    nExpectedTime = staking ? (TARGET_SPACING * nNetworkWeight / nWeight) : 0;
-    
+//    if(pindexBest->nHeight <= HARD_FORK_BLOCK){
+//        nExpectedTime = staking ? (TARGET_SPACING_FORK * nNetworkWeight / nWeight) : 0;
+//    } else {
+        nExpectedTime = staking ? (TARGET_SPACING * nNetworkWeight / nWeight) : 0;
+//    }
 
     Object obj;
 
@@ -251,6 +253,9 @@ Value getworkex(const Array& params, bool fHelp)
 
     if (IsInitialBlockDownload())
         throw JSONRPCError(-10, "Simplicity is downloading blocks...");
+
+//    if (pindexBest->nHeight >= Params().LastPOWBlock())
+//        throw JSONRPCError(RPC_MISC_ERROR, "No more PoW blocks");
 
     typedef map<uint256, pair<CBlock*, CScript> > mapNewBlock_t;
     static mapNewBlock_t mapNewBlock;
@@ -383,6 +388,9 @@ Value getwork(const Array& params, bool fHelp)
     if (IsInitialBlockDownload())
         throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Simplicity is downloading blocks...");
 
+//    if (pindexBest->nHeight >= Params().LastPOWBlock())
+//        throw JSONRPCError(RPC_MISC_ERROR, "No more PoW blocks");
+
     typedef map<uint256, pair<CBlock*, CScript> > mapNewBlock_t;
     static mapNewBlock_t mapNewBlock;    // FIXME: thread safety
     static vector<CBlock*> vNewBlock;
@@ -498,6 +506,14 @@ Value getblocktemplate(const Array& params, bool fHelp)
             "  \"sizelimit\" : limit of block size\n"
             "  \"bits\" : compressed target of next block\n"
             "  \"height\" : height of the next block\n"
+            "  \"payee\" : \"xxx\",                (string) required payee for the next block\n"
+            "  \"payee_amount\" : n,               (numeric) required amount to pay\n"
+            "  \"votes\" : [\n                     (array) show vote candidates\n"
+            "        { ... }                       (json object) vote candidate\n"
+            "        ,...\n"
+            "  ],\n"
+            "  \"masternode_payments\" : true|false,         (boolean) true, if masternode payments are enabled"
+            "  \"enforce_masternode_payments\" : true|false  (boolean) true, if masternode payments are enforced"
             "See https://en.bitcoin.it/wiki/BIP_0022 for full specification.");
 
     std::string strMode = "template";
@@ -523,6 +539,9 @@ Value getblocktemplate(const Array& params, bool fHelp)
 
     //if (IsInitialBlockDownload())
     //    throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Simplicity is downloading blocks...");
+
+//    if (pindexBest->nHeight >= Params().LastPOWBlock())
+//        throw JSONRPCError(RPC_MISC_ERROR, "No more PoW blocks");
 
     // Update block
     static unsigned int nTransactionsUpdatedLast;

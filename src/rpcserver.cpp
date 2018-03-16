@@ -248,11 +248,12 @@ static const CRPCCommand vRPCCommands[] =
     { "searchrawtransactions",  &searchrawtransactions,  false,     false,     false },
 
 /* Dark features */
-    { "darksend",               &darksend,               false,     false,      true },
     { "spork",                  &spork,                  true,      false,      false },
     { "masternode",             &masternode,             true,      false,      true },
-
+    { "masternodelist",         &masternodelist,         true,      false,      false },
+    
 #ifdef ENABLE_WALLET
+    { "darksend",               &darksend,               false,     false,      true },
     { "getmininginfo",          &getmininginfo,          true,      false,     false },
     { "getstakinginfo",         &getstakinginfo,         true,      false,     false },
     { "getnewaddress",          &getnewaddress,          true,      false,     true },
@@ -302,10 +303,10 @@ static const CRPCCommand vRPCCommands[] =
     { "resendtx",               &resendtx,               false,     true,      true },
     { "makekeypair",            &makekeypair,            false,     true,      false },
     { "checkkernel",            &checkkernel,            true,      false,     true },
-    { "getnewstealthaddress",   &getnewstealthaddress,   false,     false,      true},
-    { "liststealthaddresses",   &liststealthaddresses,   false,     false,      true},
-    { "importstealthaddress",   &importstealthaddress,   false,     false,      true},
-    { "sendtostealthaddress",   &sendtostealthaddress,   false,     false,      true},
+    { "getnewstealthaddress",   &getnewstealthaddress,   false,     false,     true},
+    { "liststealthaddresses",   &liststealthaddresses,   false,     false,     true},
+    { "importstealthaddress",   &importstealthaddress,   false,     false,     true},
+    { "sendtostealthaddress",   &sendtostealthaddress,   false,     false,     true},
     { "smsgenable",             &smsgenable,             false,     false,     false },
     { "smsgdisable",            &smsgdisable,            false,     false,     false },
     { "smsglocalkeys",          &smsglocalkeys,          false,     false,     false },

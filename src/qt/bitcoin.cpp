@@ -20,7 +20,6 @@
 #include "macdockiconhandler.h"
 #endif
 
-#include <QApplication>
 #include <QMessageBox>
 #include <QTextCodec>
 #include <QLocale>

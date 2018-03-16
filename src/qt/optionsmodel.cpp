@@ -142,7 +142,7 @@ void OptionsModel::Init()
     if (settings.contains("nDarksendRounds"))
         SoftSetArg("-darksendrounds", settings.value("nDarksendRounds").toString().toStdString());
     if (settings.contains("nAnonymizeSimplicityAmount"))
-        SoftSetArg("-anonymizeSimplicityamount", settings.value("nAnonymizeSimplicityAmount").toString().toStdString());
+        SoftSetArg("-anonymizesimplicityamount", settings.value("nAnonymizeSimplicityAmount").toString().toStdString());
 
 #ifdef USE_NATIVE_I2P
     ScopeGroupHelper s(settings, I2P_OPTIONS_SECTION_NAME);
@@ -246,6 +246,10 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return settings.value("language", "");
         case CoinControlFeatures:
             return QVariant(fCoinControlFeatures);
+        case DarksendRounds:
+            return QVariant(nDarksendRounds);
+        case AnonymizeSimplicityAmount:
+            return QVariant(nAnonymizeSimplicityAmount);
         case MinimizeCoinAge:
             return settings.value("fMinimizeCoinAge", GetBoolArg("-minimizecoinage", false));
         case UseBlackTheme:
@@ -397,7 +401,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             settings.setValue("nDarksendRounds", nDarksendRounds);
             emit darksendRoundsChanged(nDarksendRounds);
             break;
-        case anonymizeSimplicityAmount:
+        case AnonymizeSimplicityAmount:
             nAnonymizeSimplicityAmount = value.toInt();
             settings.setValue("nAnonymizeSimplicityAmount", nAnonymizeSimplicityAmount);
             emit anonymizeSimplicityAmountChanged(nAnonymizeSimplicityAmount);

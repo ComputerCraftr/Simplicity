@@ -22,12 +22,13 @@ class CValidationState;
 #define START_MASTERNODE_PAYMENTS 1517688600 // Saturday, February 3, 2018 8:10:00 PM
 
 static const int64_t DARKSEND_COLLATERAL = (200000*COIN);
-static const int64_t DARKSEND_FEE = (0.01*COIN);
+//static const int64_t DARKSEND_FEE = (0.01*COIN);
 static const int64_t DARKSEND_POOL_MAX = (999999999.99*COIN);
 
 /*
-    At 5 signatures, 1/2 of the masternode network can be owned by
+    At 15 signatures, 1/2 of the masternode network can be owned by
     one party without comprimising the security of InstantX
+    (1000/2150.0)**15 = 1.031e-05
 */
 #define INSTANTX_SIGNATURES_REQUIRED           5
 #define INSTANTX_SIGNATURES_TOTAL              15
@@ -46,6 +47,7 @@ static const int64_t DARKSEND_POOL_MAX = (999999999.99*COIN);
 #define MASTERNODE_MIN_DSEEP_SECONDS           (15*60)
 #define MASTERNODE_MIN_DSEE_SECONDS            (5*60)
 #define MASTERNODE_PING_SECONDS                (5*60)
+#define MASTERNODE_PING_WAIT_SECONDS           (5*60)
 #define MASTERNODE_EXPIRATION_SECONDS          (65*60)
 #define MASTERNODE_REMOVAL_SECONDS             (70*60)
 
@@ -92,6 +94,7 @@ static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20
 /** Future Drift time set in seconds */
 static const int64_t DRIFT = 600; // 10min drift time
 inline int64_t FutureDrift(int64_t nTime) { return nTime + DRIFT; }
+
 inline int64_t GetMNCollateral(int nHeight) { return 200000; }
 
 extern CScript COINBASE_FLAGS;
@@ -280,10 +283,6 @@ public:
         SetNull();
     }
 
-    CTransaction(int nVersion, unsigned int nTime, const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout, unsigned int nLockTime)
-        : nVersion(nVersion), nTime(nTime), vin(vin), vout(vout), nLockTime(nLockTime), nDoS(0)
-    {
-    }
 
     IMPLEMENT_SERIALIZE
     (
@@ -708,7 +707,7 @@ public:
 
     uint256 GetPoWHash() const
     {
-     return Hash9(BEGIN(nVersion), END(nNonce));
+        return Hash9(BEGIN(nVersion), END(nNonce));
     }
 
     int64_t GetBlockTime() const

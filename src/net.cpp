@@ -154,8 +154,8 @@ bool RecvLine(SOCKET hSocket, string& strLine)
     {
         char c;
         int nBytes = recv(hSocket, &c, 1, MSG_DONTWAIT);
-    if(ShutdownRequested())
-        return false;
+	if(ShutdownRequested())
+	    return false;
 
         if (nBytes > 0)
         {
@@ -378,7 +378,7 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest, bool darkSendMaste
         CNode* pnode = FindNode((CService)addrConnect);
         if (pnode)
         {
-        if(darkSendMaster)
+	    if(darkSendMaster)
                 pnode->fDarkSendMaster = true;
 
             pnode->AddRef();
@@ -570,7 +570,7 @@ bool CNode::ReceiveMsgBytes(const char *pch, unsigned int nBytes)
 #else
             vRecvMsg.push_back(CNetMessage(SER_NETWORK, nRecvVersion));
 #endif
-            
+
         CNetMessage& msg = vRecvMsg.back();
 
         // absorb network data
@@ -746,6 +746,7 @@ void ThreadSocketHandler()
 #ifdef USE_NATIVE_I2P
     int nPrevI2PNodeCount = 0;
 #endif
+
     while (true)
     {
         //
@@ -822,6 +823,7 @@ void ThreadSocketHandler()
         }
 #endif
 
+
         //
         // Find which sockets have data to receive
         //
@@ -837,7 +839,6 @@ void ThreadSocketHandler()
         FD_ZERO(&fdsetError);
         SOCKET hSocketMax = 0;
         bool have_fds = false;
-
 #ifdef USE_NATIVE_I2P
         BOOST_FOREACH(SOCKET hI2PListenSocket, vhI2PListenSocket) {
             FD_SET(hI2PListenSocket, &fdsetRecv);
@@ -1007,7 +1008,6 @@ void ThreadSocketHandler()
                 BindListenNativeI2P(hI2PListenSocket);
             }
         }
-
 #endif
 
         //
@@ -1175,7 +1175,7 @@ void ThreadMapPort()
 
         try {
           while (!ShutdownRequested()) {
-        boost::this_thread::interruption_point();
+		boost::this_thread::interruption_point();
 
 #ifndef UPNPDISCOVER_SUCCESS
                 /* miniupnpc 1.5 */
@@ -1685,7 +1685,6 @@ bool IsI2POnly()
 #endif
 
 
-
 bool BindListenPort(const CService &addrBind, string& strError)
 {
     strError = "";
@@ -1975,86 +1974,6 @@ void RelayTransactionLockReq(const CTransaction& tx, const uint256& hash, bool r
     }
 
 }
-
-void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNew)
-{
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        pnode->PushMessage("dsf", sessionID, txNew);
-    }
-}
-
-void RelayDarkSendIn(const std::vector<CTxIn>& in, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& out)
-{
-    LOCK(cs_vNodes);
-
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        if((CNetAddr)darkSendPool.submittedToMasternode != (CNetAddr)pnode->addr) continue;
-        LogPrintf("RelayDarkSendIn - found master, relaying message - %s \n", pnode->addr.ToString().c_str());
-        pnode->PushMessage("dsi", in, nAmount, txCollateral, out);
-    }
-}
-
-void RelayDarkSendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error)
-{
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        pnode->PushMessage("dssu", sessionID, newState, newEntriesCount, newAccepted, error);
-    }
-}
-
-void RelayDarkSendElectionEntry(const CTxIn vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion)
-{
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        if(!pnode->fRelayTxes) continue;
-
-        pnode->PushMessage("dsee", vin, addr, vchSig, nNow, pubkey, pubkey2, count, current, lastUpdated, protocolVersion);
-    }
-}
-
-void SendDarkSendElectionEntry(const CTxIn vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion)
-{
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        pnode->PushMessage("dsee", vin, addr, vchSig, nNow, pubkey, pubkey2, count, current, lastUpdated, protocolVersion);
-    }
-}
-
-void RelayDarkSendElectionEntryPing(const CTxIn vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop)
-{
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        if(!pnode->fRelayTxes) continue;
-
-        pnode->PushMessage("dseep", vin, vchSig, nNow, stop);
-    }
-}
-
-void SendDarkSendElectionEntryPing(const CTxIn vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop)
-{
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        pnode->PushMessage("dseep", vin, vchSig, nNow, stop);
-    }
-}
-
-void RelayDarkSendCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage)
-{
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        pnode->PushMessage("dsc", sessionID, error, errorMessage);
-    }
-}
-
 
 void CNode::RecordBytesRecv(uint64_t bytes)
 {

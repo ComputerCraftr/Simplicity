@@ -36,24 +36,23 @@
 #include "masternodemanager.h"
 #include "messagemodel.h"
 // Uncomment to build SPL Adv
-//#include "radio.h"
-//#include "bitcointalk.h"
-//#include "twitter.h"
-//#include "bittrex.h"
-//#include "coinexchange.h"
-//#include "yobit.h"
+#include "radio.h"
+#include "bitcointalk.h"
+#include "twitter.h"
+#include "bittrex.h"
+#include "coinexchange.h"
+#include "yobit.h"
 #include "messagepage.h"
 #include "blockbrowser.h"
-
 #ifdef USE_NATIVE_I2P
 #include "showi2paddresses.h"
 #endif
+#include "tradingdialog.h"
 
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
 #endif
 
-#include <QApplication>
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QMenu>
@@ -146,24 +145,30 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     transactionView = new TransactionView(this);
     vbox->addWidget(transactionView);
     transactionsPage->setLayout(vbox);
+	
+	blockBrowser = new BlockBrowser(this);
 
-    blockBrowser = new BlockBrowser(this);
     addressBookPage = new AddressBookPage(AddressBookPage::ForEditing, AddressBookPage::SendingTab);
+
     receiveCoinsPage = new AddressBookPage(AddressBookPage::ForEditing, AddressBookPage::ReceivingTab);
+
     sendCoinsPage = new SendCoinsDialog(this);
+
+    tradingDialogPage = new tradingDialog(this);
+    tradingDialogPage->setObjectName("tradingDialog");
+     
     signVerifyMessageDialog = new SignVerifyMessageDialog(this);
 
     masternodeManagerPage = new MasternodeManager(this);
     messagePage = new MessagePage(this);
-
-//    Uncomment to build SPL Adv
-//
-//    radioPage = new Radio(this);
-//    bitcointalkPage = new Bitcointalk(this);
-//    twitterPage = new Twitter(this);
-//    bittrexPage = new Bittrex(this);
-//    coinexchangePage = new Coinexchange(this);
-//    yobitPage = new Yobit(this);
+	
+    // Uncomment to build SPL Adv
+    radioPage = new Radio(this);
+    bitcointalkPage = new Bitcointalk(this);
+    twitterPage = new Twitter(this);
+    bittrexPage = new Bittrex(this);
+    coinexchangePage = new Coinexchange(this);
+    yobitPage = new Yobit(this);
     
     centralStackedWidget = new QStackedWidget(this);
     centralStackedWidget->setContentsMargins(0, 0, 0, 0);
@@ -175,16 +180,15 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     centralStackedWidget->addWidget(masternodeManagerPage);
     centralStackedWidget->addWidget(messagePage);
     centralStackedWidget->addWidget(blockBrowser);
-
-//    Uncomment to build SPL Adv
-//
-//    centralStackedWidget->addWidget(radioPage);
-//    centralStackedWidget->addWidget(bitcointalkPage);
-//    centralStackedWidget->addWidget(twitterPage);
-//    centralStackedWidget->addWidget(bittrexPage);
-//    centralStackedWidget->addWidget(coinexchangePage);
-//    centralStackedWidget->addWidget(yobitPage);
-
+    // Uncomment to build SPL Adv
+    centralStackedWidget->addWidget(radioPage);
+    centralStackedWidget->addWidget(bitcointalkPage);
+    centralStackedWidget->addWidget(twitterPage);
+    centralStackedWidget->addWidget(bittrexPage);
+    centralStackedWidget->addWidget(coinexchangePage);
+    centralStackedWidget->addWidget(yobitPage);
+    centralStackedWidget->addWidget(tradingDialogPage);
+    
     QWidget *centralWidget = new QWidget();
     QVBoxLayout *centralLayout = new QVBoxLayout(centralWidget);
     centralLayout->setContentsMargins(0,0,0,0);
@@ -275,6 +279,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), this, SLOT(gotoHistoryPage()));
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), transactionView, SLOT(focusTransaction(QModelIndex)));
 
+    connect(TradingAction, SIGNAL(triggered()), tradingDialogPage, SLOT(InitTrading()));
+    
     // Double-clicking on a transaction on the transaction history page shows details
     connect(transactionView, SIGNAL(doubleClicked(QModelIndex)), transactionView, SLOT(showDetails()));
 
@@ -344,51 +350,58 @@ void BitcoinGUI::createActions()
     messageAction->setCheckable(true);
     tabGroup->addAction(messageAction);
 
+   
     blockAction = new QAction(QIcon(":/icons/"), tr("&Block Explorer"), this);
     blockAction->setToolTip(tr("Explore the BlockChain"));
     blockAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
     blockAction->setCheckable(true);
     tabGroup->addAction(blockAction);
 
-//    Uncomment to build SPL Adv
-//
-//    radioAction = new QAction(QIcon(":/icons/fury"), tr("&Radio"), this);
-//    radioAction->setToolTip(tr("Hip Hop"));
-//    radioAction->setCheckable(true);
-//    radioAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
-//    tabGroup->addAction(radioAction);
-//    
-//    bitcointalkAction = new QAction(QIcon(":/icons/fury"), tr("&Bitcointalk"), this);
-//    bitcointalkAction->setToolTip(tr("Bitcointalk"));
-//    bitcointalkAction->setCheckable(true);
-//    bitcointalkAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
-//    tabGroup->addAction(bitcointalkAction);
-//
-//    twitterAction = new QAction(QIcon(":/icons/fury"), tr("&Twitter"), this);
-//    twitterAction->setToolTip(tr("Twitter"));
-//    twitterAction->setCheckable(true);
-//    twitterAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
-//    tabGroup->addAction(twitterAction);
-//
-//    bittrexAction = new QAction(QIcon(":/icons/fury"), tr("&Bittrex"), this);
-//    bittrexAction->setToolTip(tr("Bittrex"));
-//    bittrexAction->setCheckable(true);
-//    bittrexAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_0));
-//    tabGroup->addAction(bittrexAction);
-//
-//    coinexchangeAction = new QAction(QIcon(":/icons/fury"), tr("&Coinexchange"), this);
-//    coinexchangeAction->setToolTip(tr("Coinexchange"));
-//    coinexchangeAction->setCheckable(true);
-//    coinexchangeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
-//    tabGroup->addAction(coinexchangeAction);
-//
-//    yobitAction = new QAction(QIcon(":/icons/fury"), tr("&Yobit"), this);
-//    yobitAction->setToolTip(tr("Yobit"));
-//    yobitAction->setCheckable(true);
-//    yobitAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_2));
-//    tabGroup->addAction(yobitAction);
+    // Uncomment to build SPL Adv
+    radioAction = new QAction(QIcon(":/icons/fury"), tr("&Radio"), this);
+    radioAction->setToolTip(tr("Hip Hop"));
+    radioAction->setCheckable(true);
+    radioAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
+    tabGroup->addAction(radioAction);
     
+    bitcointalkAction = new QAction(QIcon(":/icons/fury"), tr("&Bitcointalk"), this);
+    bitcointalkAction->setToolTip(tr("Bitcointalk"));
+    bitcointalkAction->setCheckable(true);
+    bitcointalkAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
+    tabGroup->addAction(bitcointalkAction);
 
+    twitterAction = new QAction(QIcon(":/icons/fury"), tr("&Twitter"), this);
+    twitterAction->setToolTip(tr("Twitter"));
+    twitterAction->setCheckable(true);
+    twitterAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
+    tabGroup->addAction(twitterAction);
+
+    bittrexAction = new QAction(QIcon(":/icons/fury"), tr("&Bittrex"), this);
+    bittrexAction->setToolTip(tr("Bittrex"));
+    bittrexAction->setCheckable(true);
+    bittrexAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_0));
+    tabGroup->addAction(bittrexAction);
+
+    coinexchangeAction = new QAction(QIcon(":/icons/fury"), tr("&Coinexchange"), this);
+    coinexchangeAction->setToolTip(tr("Coinexchange"));
+    coinexchangeAction->setCheckable(true);
+    coinexchangeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
+    tabGroup->addAction(coinexchangeAction);
+
+    yobitAction = new QAction(QIcon(":/icons/fury"), tr("&Yobit"), this);
+    yobitAction->setToolTip(tr("Yobit"));
+    yobitAction->setCheckable(true);
+    yobitAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_2));
+    tabGroup->addAction(yobitAction);
+	
+    TradingAction = new QAction(tr("&Trade"), this);
+    TradingAction ->setToolTip(tr("Start Trading"));
+    TradingAction ->setCheckable(true);
+    TradingAction ->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
+    TradingAction->setProperty("objectName","TradingAction");
+    //tabGroup->addAction(TradingAction);
+
+    connect(TradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));    
     connect(blockAction, SIGNAL(triggered()), this, SLOT(gotoBlockBrowser()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
@@ -404,21 +417,19 @@ void BitcoinGUI::createActions()
     connect(masternodeManagerAction, SIGNAL(triggered()), this, SLOT(gotoMasternodeManagerPage()));
     connect(messageAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(messageAction, SIGNAL(triggered()), this, SLOT(gotoMessagePage()));
-//    Uncomment to build SPL Adv
-//
-//    connect(radioAction, SIGNAL(triggered()), this, SLOT(gotoRadioPage()));
-//    connect(radioAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-//    connect(bitcointalkAction, SIGNAL(triggered()), this, SLOT(gotoBitcointalkPage()));
-//    connect(bitcointalkAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-//    connect(twitterAction, SIGNAL(triggered()), this, SLOT(gotoTwitterPage()));
-//    connect(twitterAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-//    connect(bittrexAction, SIGNAL(triggered()), this, SLOT(gotoBittrexPage()));
-//    connect(bittrexAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-//    connect(coinexchangeAction, SIGNAL(triggered()), this, SLOT(gotoCoinexchangePage()));
-//    connect(coinexchangeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-//    connect(yobitAction, SIGNAL(triggered()), this, SLOT(gotoYobitPage()));
-//    connect(yobitAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    
+    // Uncomment to build SPL Adv
+    connect(radioAction, SIGNAL(triggered()), this, SLOT(gotoRadioPage()));
+    connect(radioAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(bitcointalkAction, SIGNAL(triggered()), this, SLOT(gotoBitcointalkPage()));
+    connect(bitcointalkAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(twitterAction, SIGNAL(triggered()), this, SLOT(gotoTwitterPage()));
+    connect(twitterAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(bittrexAction, SIGNAL(triggered()), this, SLOT(gotoBittrexPage()));
+    connect(bittrexAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(coinexchangeAction, SIGNAL(triggered()), this, SLOT(gotoCoinexchangePage()));
+    connect(coinexchangeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(yobitAction, SIGNAL(triggered()), this, SLOT(gotoYobitPage()));
+    connect(yobitAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
 
     quitAction = new QAction(tr("E&xit"), this);
     quitAction->setToolTip(tr("Quit application"));
@@ -483,23 +494,22 @@ void BitcoinGUI::createMenuBar()
     file->addSeparator();
     file->addAction(quitAction);
 
-//    Uncomment to build SPL Adv
-//
-//    QMenu *radio = appMenuBar->addMenu(tr("&Radio"));
-//    radio->addAction(radioAction);
-//
-//    QMenu *social = appMenuBar->addMenu(tr("&Social"));
-//    social->addAction(bitcointalkAction);
-//    social->addSeparator();
-//    social->addAction(twitterAction);
-//
-//    QMenu *exchanges = appMenuBar->addMenu(tr("&Exchanges"));
-//    exchanges->addAction(bittrexAction);
-//    exchanges->addSeparator();
-//    exchanges->addAction(coinexchangeAction);
-//    exchanges->addSeparator();
-//    exchanges->addAction(yobitAction);
-//
+    // Uncomment to build SPL Adv
+    QMenu *radio = appMenuBar->addMenu(tr("&Radio"));
+    radio->addAction(radioAction);
+
+    QMenu *social = appMenuBar->addMenu(tr("&Social"));
+    social->addAction(bitcointalkAction);
+    social->addSeparator();
+    social->addAction(twitterAction);
+
+    QMenu *exchanges = appMenuBar->addMenu(tr("&Exchanges"));
+    exchanges->addAction(bittrexAction);
+    exchanges->addSeparator();
+    exchanges->addAction(coinexchangeAction);
+    exchanges->addSeparator();
+    exchanges->addAction(yobitAction);
+
     QMenu *settings = appMenuBar->addMenu(tr("&Settings"));
     settings->addAction(encryptWalletAction);
     settings->addAction(changePassphraseAction);
@@ -525,7 +535,6 @@ static QWidget* makeToolBarSpacer()
 
 void BitcoinGUI::createToolBars()
 {
-
     QToolBar *toolbar = addToolBar(tr("Tabs toolbar"));
     toolbar->setObjectName("toolbar");
     addToolBar(Qt::LeftToolBarArea,toolbar);
@@ -555,6 +564,7 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(masternodeManagerAction);
     toolbar->addAction(messageAction);
     toolbar->addAction(blockAction);
+    //toolbar->addAction(TradingAction);
     netLabel = new QLabel();
 
     QWidget *spacer = makeToolBarSpacer();
@@ -661,7 +671,7 @@ void BitcoinGUI::setWalletModel(WalletModel *walletModel)
         receiveCoinsPage->setModel(walletModel->getAddressTableModel());
         sendCoinsPage->setModel(walletModel);
         signVerifyMessageDialog->setModel(walletModel);
-        blockBrowser->setModel(walletModel);
+		blockBrowser->setModel(walletModel);
 
         setEncryptionStatus(walletModel->getEncryptionStatus());
         connect(walletModel, SIGNAL(encryptionStatusChanged(int)), this, SLOT(setEncryptionStatus(int)));
@@ -1093,6 +1103,16 @@ void BitcoinGUI::gotoAddressBookPage()
     connect(exportAction, SIGNAL(triggered()), addressBookPage, SLOT(exportClicked()));
 }
 
+void BitcoinGUI::gotoTradingPage()
+{
+
+     TradingAction->setChecked(true);
+     centralStackedWidget->setCurrentWidget(tradingDialogPage);
+
+  //  exportAction->setEnabled(false);
+  //  disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
 void BitcoinGUI::gotoReceiveCoinsPage()
 {
     receiveCoinsAction->setChecked(true);
@@ -1140,61 +1160,60 @@ void BitcoinGUI::gotoMessagePage()
     connect(exportAction, SIGNAL(triggered()), messagePage, SLOT(exportClicked()));
 }
 
-//    Uncomment to build SPL Adv
-//
-//void BitcoinGUI::gotoRadioPage()
-//{
-//    radioAction->setChecked(true);
-//    centralStackedWidget->setCurrentWidget(radioPage);
-//
-//    exportAction->setEnabled(false);
-//    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
-//}
-//
-//void BitcoinGUI::gotoBitcointalkPage()
-//{
-//    bitcointalkAction->setChecked(true);
-//    centralStackedWidget->setCurrentWidget(bitcointalkPage);
-//
-//    exportAction->setEnabled(false);
-//    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
-//}
-//
-//void BitcoinGUI::gotoTwitterPage()
-//{
-//    twitterAction->setChecked(true);
-//    centralStackedWidget->setCurrentWidget(twitterPage);
-//
-//    exportAction->setEnabled(false);
-//    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
-//}
-//
-//void BitcoinGUI::gotoBittrexPage()
-//{
-//    bittrexAction->setChecked(true);
-//    centralStackedWidget->setCurrentWidget(bittrexPage);
-//
-//    exportAction->setEnabled(false);
-//    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
-//}
-//
-//void BitcoinGUI::gotoCoinexchangePage()
-//{
-//    coinexchangeAction->setChecked(true);
-//    centralStackedWidget->setCurrentWidget(coinexchangePage);
-//
-//    exportAction->setEnabled(false);
-//    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
-//}
-//
-//void BitcoinGUI::gotoYobitPage()
-//{
-//    yobitAction->setChecked(true);
-//    centralStackedWidget->setCurrentWidget(yobitPage);
-//
-//    exportAction->setEnabled(false);
-//    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
-//}
+// Uncomment to build SPL Adv
+void BitcoinGUI::gotoRadioPage()
+{
+    radioAction->setChecked(true);
+    centralStackedWidget->setCurrentWidget(radioPage);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
+void BitcoinGUI::gotoBitcointalkPage()
+{
+    bitcointalkAction->setChecked(true);
+    centralStackedWidget->setCurrentWidget(bitcointalkPage);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
+void BitcoinGUI::gotoTwitterPage()
+{
+    twitterAction->setChecked(true);
+    centralStackedWidget->setCurrentWidget(twitterPage);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
+void BitcoinGUI::gotoBittrexPage()
+{
+    bittrexAction->setChecked(true);
+    centralStackedWidget->setCurrentWidget(bittrexPage);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
+void BitcoinGUI::gotoCoinexchangePage()
+{
+    coinexchangeAction->setChecked(true);
+    centralStackedWidget->setCurrentWidget(coinexchangePage);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
+void BitcoinGUI::gotoYobitPage()
+{
+    yobitAction->setChecked(true);
+    centralStackedWidget->setCurrentWidget(yobitPage);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
 
 void BitcoinGUI::dragEnterEvent(QDragEnterEvent *event)
 {
@@ -1388,9 +1407,11 @@ void BitcoinGUI::updateStakingIcon()
         uint64_t nWeight = this->nWeight;
         uint64_t nNetworkWeight = GetPoSKernelPS();
         unsigned nEstimateTime = 0;
-
-        nEstimateTime = TARGET_SPACING * nNetworkWeight / nWeight;
-        
+//        if(pindexBest->nHeight <= HARD_FORK_BLOCK){
+//            nEstimateTime = TARGET_SPACING_FORK * nNetworkWeight / nWeight;
+//        } else {
+            nEstimateTime = TARGET_SPACING * nNetworkWeight / nWeight;
+//        }
 
         QString text;
         if (nEstimateTime < 60)

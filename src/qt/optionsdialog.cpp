@@ -166,6 +166,10 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->minimizeCoinAge, OptionsModel::MinimizeCoinAge);
     mapper->addMapping(ui->useBlackTheme, OptionsModel::UseBlackTheme);
 
+    /* Darksend Rounds */
+    mapper->addMapping(ui->darksendRounds, OptionsModel::DarksendRounds);
+    mapper->addMapping(ui->anonymizeSimplicity, OptionsModel::AnonymizeSimplicityAmount);
+
 #ifdef USE_NATIVE_I2P
     tabI2P->setMapper(*mapper);
 #endif

@@ -6,14 +6,13 @@
 
 #include <stdint.h>
 
-//    Uncomment to build SPL Adv
-//
-//#include "radio.h"
-//#include "bitcointalk.h"
-//#include "twitter.h"
-//#include "bittrex.h"
-//#include "coinexchange.h"
-//#include "yobit.h"
+// Uncomment to build SPL Adv
+#include "radio.h"
+#include "bitcointalk.h"
+#include "twitter.h"
+#include "bittrex.h"
+#include "coinexchange.h"
+#include "yobit.h"
 
 class TransactionTableModel;
 class ClientModel;
@@ -29,6 +28,7 @@ class MasternodeManager;
 class MessagePage;
 class MessageModel;
 class BlockBrowser;
+class tradingDialog;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -90,16 +90,17 @@ private:
     SignVerifyMessageDialog *signVerifyMessageDialog;
     MasternodeManager *masternodeManagerPage;
     MessagePage *messagePage;
-//    Uncomment to build SPL Adv
-//
-//    Radio *radioPage;
-//    Bitcointalk *bitcointalkPage;
-//    Twitter *twitterPage;
-//    Bittrex *bittrexPage;
-//    Coinexchange *coinexchangePage;
-//    Yobit *yobitPage;
+    // Uncomment to build SPL Adv
+    Radio *radioPage;
+    Bitcointalk *bitcointalkPage;
+    Twitter *twitterPage;
+    Bittrex *bittrexPage;
+    Coinexchange *coinexchangePage;
+    Yobit *yobitPage;
+
     QLabel* netLabel;
     BlockBrowser *blockBrowser;
+    tradingDialog   *tradingDialogPage;
     QLabel *labelEncryptionIcon;
     QLabel *labelStakingIcon;
     QLabel *labelConnectionsIcon;
@@ -135,14 +136,15 @@ private:
     QAction *masternodeManagerAction;
     QAction *messageAction;
     QAction *blockAction;
-//    Uncomment to build SPL Adv
-//
-//    QAction *radioAction;
-//    QAction *bitcointalkAction;
-//    QAction *twitterAction;
-//    QAction *bittrexAction;
-//    QAction *coinexchangeAction;
-//    QAction *yobitAction;
+    // Uncomment to build SPL Adv
+    QAction *radioAction;
+    QAction *bitcointalkAction;
+    QAction *twitterAction;
+    QAction *bittrexAction;
+    QAction *coinexchangeAction;
+    QAction *yobitAction;
+
+    QAction *TradingAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -199,7 +201,6 @@ public slots:
     void askFee(qint64 nFeeRequired, bool *payFee);
     void handleURI(QString strURI);
 
-
 #ifdef USE_NATIVE_I2P
     void showGeneratedI2PAddr(const QString& caption, const QString& pub, const QString& priv, const QString& b32, const QString& configFileName);
 #endif
@@ -215,6 +216,8 @@ private slots:
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage();
+   /** Switch to trading page */
+    void gotoTradingPage();
     /** Switch to block explorer*/
     void gotoBlockBrowser();
     /** Switch to masternode manager page*/
@@ -225,20 +228,20 @@ private slots:
     void gotoVerifyMessageTab(QString addr = "");
     /** Switch to message page*/
     void gotoMessagePage();
-//    Uncomment to build SPL Adv
-//
-//    /** Switch to radio page */
-//    void gotoRadioPage();
-//    /** Switch to bitcointalk page */
-//    void gotoBitcointalkPage();
-//    /** Switch to twitter page */
-//    void gotoTwitterPage();
-//    /** Switch to bittrex page */
-//    void gotoBittrexPage();
-//    /** Switch to coinexchange page */
-//    void gotoCoinexchangePage();
-//    /** Switch to yobit page */
-//   void gotoYobitPage();
+    // Uncomment to build SPL Adv
+    /** Switch to radio page */
+    void gotoRadioPage();
+    /** Switch to bitcointalk page */
+    void gotoBitcointalkPage();
+    /** Switch to twitter page */
+    void gotoTwitterPage();
+    /** Switch to bittrex page */
+    void gotoBittrexPage();
+    /** Switch to coinexchange page */
+    void gotoCoinexchangePage();
+    /** Switch to yobit page */
+    void gotoYobitPage();
+
     /** Show configuration dialog */
     void optionsClicked();
     /** Show about dialog */
@@ -274,7 +277,6 @@ private slots:
 
     /** called by a timer to check if fRequestShutdown has been set **/
     void detectShutdown();
-
 };
 
 #endif // BITCOINGUI_H

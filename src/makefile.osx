@@ -19,7 +19,7 @@ LIBPATHS= \
  -L"$(DEPSDIR)/lib" \
  -L"$(DEPSDIR)/Cellar/berkeley-db4/4.8.30/lib"
 
-USE_UPNP:=0
+USE_UPNP:=1
 USE_WALLET:=1
 
 LIBS= -dead_strip
@@ -63,6 +63,7 @@ CFLAGS += -Wall -Wextra -Wformat -Wno-ignored-qualifiers -Wformat-security -Wno-
     $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
 
 OBJS= \
+    obj/irc.o \
     obj/alert.o \
     obj/version.o \
     obj/checkpoints.o \
@@ -114,8 +115,12 @@ OBJS= \
     obj/crypto/sha256.o \
     obj/crypto/sha512.o \
     obj/smessage.o    \
+#    obj/cubehash.o \
+#    obj/luffa.o \
     obj/aes_helper.o \
     obj/echo.o \
+#    obj/shavite.o \
+#    obj/simd.o \
     obj/blake.o\
     obj/bmw.o\
     obj/groestl.o\

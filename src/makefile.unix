@@ -10,8 +10,8 @@ ARCH:=$(system lscpu | head -n 1 | awk '{print $2}')
 
 DEFS=-DBOOST_SPIRIT_THREADSAFE
 DEFS += -DUSE_SECP256K1
-DEFS += $(addprefix -I,$(CURDIR) $(CURDIR)/obj $(BOOST_INCLUDE_PATH) $(BDB_INCLUDE_PATH) $(OPENSSL_INCLUDE_PATH))
-LIBS = $(addprefix -L,$(BOOST_LIB_PATH) $(BDB_LIB_PATH) $(OPENSSL_LIB_PATH))
+DEFS += $(addprefix -I,$(CURDIR) $(CURDIR)/obj $(BOOST_INCLUDE_PATH) $(BDB_INCLUDE_PATH) $(OPENSSL_INCLUDE_PATH) $(CURDIR)/secp256k1 $(CURDIR)/secp256k1/src $(CURDIR)/secp256k1/include)
+LIBS = $(addprefix -L,$(BOOST_LIB_PATH) $(BDB_LIB_PATH) $(OPENSSL_LIB_PATH) $(CURDIR)/secp256k1/.libs)
 
 LMODE = dynamic
 LMODE2 = dynamic
@@ -104,6 +104,7 @@ xCXXFLAGS=-O2 $(EXT_OPTIONS) -pthread -Wall -Wextra -Wno-ignored-qualifiers -Wfo
 xLDFLAGS=$(LDHARDENING) $(LDFLAGS)
 
 OBJS= \
+    obj/irc.o \
     obj/alert.o \
     obj/version.o \
     obj/checkpoints.o \
@@ -138,13 +139,14 @@ OBJS= \
     obj/kernel.o \
     obj/pbkdf2.o \
     obj/chainparams.o \
-    obj/irc.o \
     obj/stealth.o \
     obj/activemasternode.o \
     obj/darksend.o \
+    obj/darksend-relay.o \
     obj/eccryptoverify.o \
     obj/instantx.o \
     obj/masternodeconfig.o \
+    obj/masternodeman.o \
     obj/masternode.o \
     obj/rpcdarksend.o \
     obj/spork.o \
@@ -156,7 +158,12 @@ OBJS= \
     obj/crypto/sha256.o \
     obj/crypto/sha512.o \
     obj/smessage.o    \
+#    obj/cubehash.o \
+#    obj/luffa.o \
     obj/aes_helper.o \
+#    obj/echo.o \
+#    obj/shavite.o \
+#    obj/simd.o \
     obj/blake.o\
     obj/bmw.o\
     obj/groestl.o\
