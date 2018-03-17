@@ -158,12 +158,12 @@ OBJS= \
     obj/crypto/sha256.o \
     obj/crypto/sha512.o \
     obj/smessage.o    \
-#    obj/cubehash.o \
-#    obj/luffa.o \
+    obj/cubehash.o \
+    obj/luffa.o \
     obj/aes_helper.o \
-#    obj/echo.o \
-#    obj/shavite.o \
-#    obj/simd.o \
+    obj/echo.o \
+    obj/shavite.o \
+    obj/simd.o \
     obj/blake.o\
     obj/bmw.o\
     obj/groestl.o\
