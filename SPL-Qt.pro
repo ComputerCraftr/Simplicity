@@ -12,7 +12,7 @@ CONFIG += openssl-linked
 CONFIG += openssl
 
 # Uncomment to build SPL Adv
-# QT += webkit webkitwidgets
+QT += webkit webkitwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     QT += widgets
@@ -263,9 +263,11 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/darksendconfig.h \
     src/masternode.h \
     src/darksend.h \
+	src/darksend-relay.h \
     src/instantx.h \
     src/activemasternode.h \
     src/masternodeconfig.h \
+	src/masternodeman.h \
     src/spork.h \
     src/crypto/common.h \
     src/crypto/hmac_sha256.h \
@@ -282,13 +284,12 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/qcustomplot.h \
     src/smessage.h \
 #    Uncomment to build SPL Adv
-#
-#    src/qt/radio.h \
-#    src/qt/bitcointalk.h \
-#    src/qt/twitter.h \
-#    src/qt/bittrex.h \
-#    src/qt/coinexchange.h \
-#    src/qt/yobit.h \
+    src/qt/radio.h \
+    src/qt/bitcointalk.h \
+    src/qt/twitter.h \
+    src/qt/bittrex.h \
+    src/qt/coinexchange.h \
+    src/qt/yobit.h \
     src/qt/messagepage.h \
     src/qt/messagemodel.h \
     src/qt/sendmessagesdialog.h \
@@ -296,6 +297,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/blockbrowser.h \
     src/qt/plugins/mrichtexteditor/mrichtextedit.h \
     src/qt/qvalidatedtextedit.h \
+	src/qt/tradingdialog.h \
     src/sph_blake.h \
     src/sph_bmw.h \
     src/sph_groestl.h \
@@ -387,11 +389,13 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/darksendconfig.cpp \
     src/masternode.cpp \
     src/darksend.cpp \
+	src/darksend-relay.cpp \
     src/rpcdarksend.cpp \
     src/instantx.cpp \
     src/activemasternode.cpp \
     src/spork.cpp \
     src/masternodeconfig.cpp \
+	src/masternodeman.cpp \
     src/crypto/hmac_sha256.cpp \
     src/crypto/hmac_sha512.cpp \
     src/crypto/rfc6979_hmac_sha256.cpp \
@@ -406,12 +410,12 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/qcustomplot.cpp \
     src/smessage.cpp \
 #    Uncomment to build SPL Adv
-#    src/qt/radio.cpp \
-#    src/qt/bitcointalk.cpp \
-#    src/qt/twitter.cpp \
-#    src/qt/bittrex.cpp \
-#    src/qt/coinexchange.cpp \
-#    src/qt/yobit.cpp \
+    src/qt/radio.cpp \
+    src/qt/bitcointalk.cpp \
+    src/qt/twitter.cpp \
+    src/qt/bittrex.cpp \
+    src/qt/coinexchange.cpp \
+    src/qt/yobit.cpp \
     src/qt/messagepage.cpp \
     src/qt/messagemodel.cpp \
     src/qt/sendmessagesdialog.cpp \
@@ -419,6 +423,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/blockbrowser.cpp \
     src/qt/qvalidatedtextedit.cpp \
     src/qt/plugins/mrichtexteditor/mrichtextedit.cpp \
+	src/qt/tradingdialog.cpp \
     src/rpcsmessage.cpp \
     src/blake.c \
     src/bmw.c \
@@ -448,16 +453,17 @@ FORMS += \
     src/qt/forms/addeditadrenalinenode.ui \
     src/qt/forms/adrenalinenodeconfigdialog.ui \
 #    Uncomment to build SPL Adv
-#    src/qt/forms/radio.ui \
-#    src/qt/forms/bitcointalk.ui \
-#    src/qt/forms/twitter.ui \
-#    src/qt/forms/bittrex.ui \
-#    src/qt/forms/coinexchange.ui \
-#    src/qt/forms/yobit.ui \
+    src/qt/forms/radio.ui \
+    src/qt/forms/bitcointalk.ui \
+    src/qt/forms/twitter.ui \
+    src/qt/forms/bittrex.ui \
+    src/qt/forms/coinexchange.ui \
+    src/qt/forms/yobit.ui \
     src/qt/forms/messagepage.ui \
     src/qt/forms/sendmessagesentry.ui \
     src/qt/forms/sendmessagesdialog.ui \
     src/qt/forms/blockbrowser.ui \
+    src/qt/forms/tradingdialog.ui \
     src/qt/plugins/mrichtexteditor/mrichtextedit.ui 
 
 contains(DEFINES, USE_NATIVE_I2P) {
