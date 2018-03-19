@@ -11,7 +11,7 @@ CXX:=$(TARGET_PLATFORM)-w64-mingw32-g++
 RANLIB=$(TARGET_PLATFORM)-w64-mingw32-ranlib
 STRIP=$(TARGET_PLATFORM)-w64-mingw32-strip
 
-USE_UPNP:=0
+USE_UPNP:=1
 USE_WALLET:=1
 
 INCLUDEPATHS= \
@@ -111,18 +111,18 @@ OBJS= \
     obj/crypto/sha1.o \
     obj/crypto/sha256.o \
     obj/crypto/sha512.o \
-    obj/smessage.o    \
+    obj/smessage.o \
     obj/cubehash.o \
     obj/luffa.o \
     obj/aes_helper.o \
     obj/echo.o \
     obj/shavite.o \
     obj/simd.o \
-    obj/blake.o\
-    obj/bmw.o\
-    obj/groestl.o\
-    obj/jh.o\
-    obj/keccak.o\
+    obj/blake.o \
+    obj/bmw.o \
+    obj/groestl.o \
+    obj/jh.o \
+    obj/keccak.o \
     obj/skein.o
 
 ifeq (${USE_WALLET}, 1)
@@ -139,7 +139,7 @@ endif
 
 all: simplicityd.exe
 
-LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
+LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a $(CURDIR)/secp256k1/src/libsecp256k1_la-secp256k1.o -lshlwapi
 DEFS += -I"$(CURDIR)/leveldb/include"
 DEFS += -I"$(CURDIR)/leveldb/helpers"
 OBJS += obj/txdb-leveldb.o
