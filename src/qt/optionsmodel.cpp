@@ -404,7 +404,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
         case AnonymizeSimplicityAmount:
             nAnonymizeSimplicityAmount = value.toInt();
             settings.setValue("nAnonymizeSimplicityAmount", nAnonymizeSimplicityAmount);
-            emit anonymizeSimplicityAmountChanged(nAnonymizeSimplicityAmount);
+            emit AnonymizeSimplicityAmountChanged(nAnonymizeSimplicityAmount);
             break;
 #ifdef USE_NATIVE_I2P
         case I2PUseI2POnly:
