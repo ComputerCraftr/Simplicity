@@ -12,7 +12,7 @@ cd ~/Simplicity/src/secp256k1
 chmod +x autogen.sh
 sudo ./autogen.sh
 sudo ./configure
-sudo make && make install
+sudo make && sudo make install
 cd ~/Simplicity/src/leveldb
 sudo sh build_detect_platform build_config.mk .
 cd ~/Simplicity/src/
