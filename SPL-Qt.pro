@@ -37,21 +37,21 @@ linux {
 # workaround for boost 1.58
 DEFINES += BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
 
-BOOST_LIB_SUFFIX=-mgw49-mt-s-1_66
-BOOST_INCLUDE_PATH=d:/project/simplicity/include/boost-1_66
-BOOST_LIB_PATH=d:/project/simplicity/lib
-BDB_INCLUDE_PATH=d:/project/simplicity/include/
-BDB_LIB_PATH=d:/project/simplicity/lib
-OPENSSL_INCLUDE_PATH=d:/project/simplicity/include/
-OPENSSL_LIB_PATH=d:/project/simplicity/lib
-MINIUPNPC_INCLUDE_PATH=d:/project/simplicity/include/
-MINIUPNPC_LIB_PATH=d:/project/simplicity/lib
-LIBPNG_INCLUDE_PATH=d:/project/simplicity/include/
-LIBPNG_LIB_PATH=d:/project/simplicity/lib
-QRENCODE_INCLUDE_PATH=d:/project/simplicity/include/
-QRENCODE_LIB_PATH=d:/project/simplicity/lib
-SECP256K1_LIB_PATH = d:/project/simplicity/include/
-SECP256K1_INCLUDE_PATH = d:/project/simplicity/lib
+#BOOST_LIB_SUFFIX=-mgw49-mt-s-1_66
+#BOOST_INCLUDE_PATH=d:/project/simplicity/include/boost-1_66
+#BOOST_LIB_PATH=d:/project/simplicity/lib
+#BDB_INCLUDE_PATH=d:/project/simplicity/include/
+#BDB_LIB_PATH=d:/project/simplicity/lib
+#OPENSSL_INCLUDE_PATH=d:/project/simplicity/include/
+#OPENSSL_LIB_PATH=d:/project/simplicity/lib
+#MINIUPNPC_INCLUDE_PATH=d:/project/simplicity/include/
+#MINIUPNPC_LIB_PATH=d:/project/simplicity/lib
+#LIBPNG_INCLUDE_PATH=d:/project/simplicity/include/
+#LIBPNG_LIB_PATH=d:/project/simplicity/lib
+#QRENCODE_INCLUDE_PATH=d:/project/simplicity/include/
+#QRENCODE_LIB_PATH=d:/project/simplicity/lib
+#SECP256K1_LIB_PATH = d:/project/simplicity/include/
+#SECP256K1_INCLUDE_PATH = d:/project/simplicity/lib
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -664,7 +664,7 @@ INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$
 LIBS += $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
 LIBS += -lssl -lcrypto -ldb_cxx$$BDB_LIB_SUFFIX
 # -lgdi32 has to happen after -lcrypto (see  #681)
-windows:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
+windows:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32 -pthread
 !windows: {
     LIBS += -lgmp
 } else {
