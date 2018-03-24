@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = Simplicity-Qt
-VERSION = 1.1
+VERSION = 1.1.0.0
 INCLUDEPATH += src src/json src/qt src/qt/plugins/mrichtexteditor
 QT += core gui network printsupport
 DEFINES += ENABLE_WALLET
@@ -8,11 +8,11 @@ DEFINES += BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
 CONFIG += no_include_pwd
 CONFIG += thread
 CONFIG += static
-CONFIG += openssl-linked
+#CONFIG += openssl-linked
 CONFIG += openssl
 
 # Uncomment to build SPL Adv
-QT += webkit webkitwidgets
+#QT += webkit webkitwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     QT += widgets
@@ -36,6 +36,22 @@ linux {
 
 # workaround for boost 1.58
 DEFINES += BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
+
+BOOST_LIB_SUFFIX=-mgw49-mt-s-1_66
+BOOST_INCLUDE_PATH=d:/project/simplicity/include/boost-1_66
+BOOST_LIB_PATH=d:/project/simplicity/lib
+BDB_INCLUDE_PATH=d:/project/simplicity/include/
+BDB_LIB_PATH=d:/project/simplicity/lib
+OPENSSL_INCLUDE_PATH=d:/project/simplicity/include/
+OPENSSL_LIB_PATH=d:/project/simplicity/lib
+MINIUPNPC_INCLUDE_PATH=d:/project/simplicity/include/
+MINIUPNPC_LIB_PATH=d:/project/simplicity/lib
+LIBPNG_INCLUDE_PATH=d:/project/simplicity/include/
+LIBPNG_LIB_PATH=d:/project/simplicity/lib
+QRENCODE_INCLUDE_PATH=d:/project/simplicity/include/
+QRENCODE_LIB_PATH=d:/project/simplicity/lib
+SECP256K1_LIB_PATH = d:/project/simplicity/include/
+SECP256K1_INCLUDE_PATH = d:/project/simplicity/lib
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -63,12 +79,15 @@ QMAKE_LFLAGS *= -fstack-protector-all --param ssp-buffer-size=1
 # We need to exclude this for Windows cross compile with MinGW 4.2.x, as it will result in a non-working executable!
 # This can be enabled for Windows, when we switch to MinGW >= 4.4.x.
 }
-
-# for extra security on Windows: enable ASLR and DEP via GCC linker flags
-win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat -static
-win32:QMAKE_LFLAGS *= -static-libgcc -static-libstdc++
 # for extra security (see: https://wiki.debian.org/Hardening): this flag is GCC compiler-specific
 QMAKE_CXXFLAGS *= -D_FORTIFY_SOURCE=2
+# for extra security on Windows: enable ASLR and DEP via GCC linker flags
+win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
+# on Windows: enable GCC large address aware linker flag
+win32:QMAKE_LFLAGS *= -Wl,--large-address-aware -static
+# i686-w64-mingw32
+win32:QMAKE_LFLAGS *= -static-libgcc -static-libstdc++
+
 # use: qmake "USE_QRCODE=1"
 # libqrencode (http://fukuchi.org/works/qrencode/index.en.html) must be installed for support
 contains(USE_QRCODE, 1) {
@@ -77,22 +96,6 @@ contains(USE_QRCODE, 1) {
     LIBS += -lqrencode
 }
 
-# use: qmake "USE_UPNP=1" ( enabled by default; default)
-#  or: qmake "USE_UPNP=0" (disabled by default)
-#  or: qmake "USE_UPNP=-" (not supported)
-# miniupnpc (http://miniupnp.free.fr/files/) must be installed for support
-contains(USE_UPNP, -) {
-    message(Building without UPNP support)
-} else {
-    message(Building with UPNP support)
-    count(USE_UPNP, 0) {
-        USE_UPNP=1
-    }
-    DEFINES += USE_UPNP=$$USE_UPNP MINIUPNP_STATICLIB STATICLIB
-    INCLUDEPATH += $$MINIUPNPC_INCLUDE_PATH
-    LIBS += $$join(MINIUPNPC_LIB_PATH,,-L,) -lminiupnpc
-    win32:LIBS += -liphlpapi
-}
 
 # use: qmake "USE_DBUS=1" or qmake "USE_DBUS=0"
 linux:count(USE_DBUS, 0) {
@@ -109,9 +112,8 @@ contains(BITCOIN_NEED_QT_PLUGINS, 1) {
     QTPLUGIN += qcncodecs qjpcodecs qtwcodecs qkrcodecs qtaccessiblewidgets
 }
 
-# LIBSEC256K1 SUPPORT
-#QMAKE_CXXFLAGS *= -DUSE_SECP256K1
 
+#Build Leveldb
 INCLUDEPATH += src/leveldb/include src/leveldb/helpers
 LIBS += $$PWD/src/leveldb/libleveldb.a $$PWD/src/leveldb/libmemenv.a
 SOURCES += src/txdb-leveldb.cpp
@@ -133,6 +135,7 @@ QMAKE_EXTRA_TARGETS += genleveldb
 # Gross ugly hack that depends on qmake internals, unfortunately there is no other way to do it.
 QMAKE_CLEAN += $$PWD/src/leveldb/libleveldb.a; cd $$PWD/src/leveldb ; $(MAKE) clean
 
+
 #Build Secp256k1
 !win32 {
 INCLUDEPATH += src/secp256k1/include
@@ -145,6 +148,13 @@ LIBS += $$PWD/src/secp256k1/src/libsecp256k1_la-secp256k1.o
     QMAKE_EXTRA_TARGETS += gensecp256k1
     # Gross ugly hack that depends on qmake internals, unfortunately there is no other way to do it.
     QMAKE_CLEAN += $$PWD/src/secp256k1/src/libsecp256k1_la-secp256k1.o; cd $$PWD/src/secp256k1; $(MAKE) clean
+} else {
+    isEmpty(SECP256K1_LIB_PATH) {
+        windows:SECP256K1_LIB_PATH=d:\project\simplicity/secp256k1/lib
+    }
+    isEmpty(SECP256K1_INCLUDE_PATH) {
+        windows:SECP256K1_INCLUDE_PATH=d:\project\simplicity/secp256k1/include
+    }
 }
 
 # regenerate src/build.h
@@ -188,7 +198,12 @@ contains(USE_O0, 1) {
     QMAKE_CFLAGS += -msse2
 }
 
-QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector -Wunused-function -Wunused-variable -fpermissive -Wconversion-null -Wmaybe-uninitialized
+QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector
+QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-variable -fpermissive
+
+windows:QMAKE_CXXFLAGS_WARN_ON += -Wno-cpp -Wno-maybe-uninitialized
+!macx:QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
+macx:QMAKE_CXXFLAGS_WARN_ON += -Wno-deprecated-declarations
 
 # Input
 DEPENDPATH += src src/json src/qt
@@ -205,11 +220,11 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/editaddressdialog.h \
     src/qt/bitcoinaddressvalidator.h \
     src/alert.h \
+    src/allocators.h \
     src/addrman.h \
     src/base58.h \
     src/bignum.h \
     src/chainparams.h \
-    src/irc.h \
     src/chainparamsseeds.h \
     src/checkpoints.h \
     src/compat.h \
@@ -235,6 +250,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/scrypt.h \
     src/init.h \
     src/mruset.h \
+    src/irc.h \
     src/json/json_spirit_writer_template.h \
     src/json/json_spirit_writer.h \
     src/json/json_spirit_value.h \
@@ -274,7 +290,6 @@ HEADERS += src/qt/bitcoingui.h \
     src/protocol.h \
     src/qt/notificator.h \
     src/qt/paymentserver.h \
-    src/allocators.h \
     src/ui_interface.h \
     src/qt/rpcconsole.h \
     src/version.h \
@@ -287,11 +302,11 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/darksendconfig.h \
     src/masternode.h \
     src/darksend.h \
-	src/darksend-relay.h \
+    src/darksend-relay.h \
     src/instantx.h \
     src/activemasternode.h \
     src/masternodeconfig.h \
-	src/masternodeman.h \
+    src/masternodeman.h \
     src/spork.h \
     src/crypto/common.h \
     src/crypto/hmac_sha256.h \
@@ -308,12 +323,12 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/qcustomplot.h \
     src/smessage.h \
 #    Uncomment to build SPL Adv
-    src/qt/radio.h \
-    src/qt/bitcointalk.h \
-    src/qt/twitter.h \
-    src/qt/bittrex.h \
-    src/qt/coinexchange.h \
-    src/qt/yobit.h \
+#    src/qt/radio.h \
+#    src/qt/bitcointalk.h \
+#    src/qt/twitter.h \
+#    src/qt/bittrex.h \
+#    src/qt/coinexchange.h \
+#    src/qt/yobit.h \
     src/qt/messagepage.h \
     src/qt/messagemodel.h \
     src/qt/sendmessagesdialog.h \
@@ -321,7 +336,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/blockbrowser.h \
     src/qt/plugins/mrichtexteditor/mrichtextedit.h \
     src/qt/qvalidatedtextedit.h \
-	src/qt/tradingdialog.h \
+    src/qt/tradingdialog.h \
     src/sph_blake.h \
     src/sph_bmw.h \
     src/sph_groestl.h \
@@ -329,7 +344,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/sph_keccak.h \
     src/sph_skein.h \
     src/sph_types.h 
-    
+
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/transactiontablemodel.cpp \
     src/qt/addresstablemodel.cpp \
@@ -344,7 +359,6 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/bitcoinaddressvalidator.cpp \
     src/alert.cpp \
     src/chainparams.cpp \
-    src/irc.cpp \
     src/version.cpp \
     src/sync.cpp \
     src/txmempool.cpp \
@@ -363,6 +377,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/checkpoints.cpp \
     src/addrman.cpp \
     src/db.cpp \
+    src/irc.cpp \
     src/walletdb.cpp \
     src/qt/clientmodel.cpp \
     src/qt/guiutil.cpp \
@@ -413,13 +428,13 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/darksendconfig.cpp \
     src/masternode.cpp \
     src/darksend.cpp \
-	src/darksend-relay.cpp \
+    src/darksend-relay.cpp \
     src/rpcdarksend.cpp \
     src/instantx.cpp \
     src/activemasternode.cpp \
+    src/masternodeman.cpp \
     src/spork.cpp \
     src/masternodeconfig.cpp \
-	src/masternodeman.cpp \
     src/crypto/hmac_sha256.cpp \
     src/crypto/hmac_sha512.cpp \
     src/crypto/rfc6979_hmac_sha256.cpp \
@@ -434,12 +449,12 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/qcustomplot.cpp \
     src/smessage.cpp \
 #    Uncomment to build SPL Adv
-    src/qt/radio.cpp \
-    src/qt/bitcointalk.cpp \
-    src/qt/twitter.cpp \
-    src/qt/bittrex.cpp \
-    src/qt/coinexchange.cpp \
-    src/qt/yobit.cpp \
+#    src/qt/radio.cpp \
+#    src/qt/bitcointalk.cpp \
+#    src/qt/twitter.cpp \
+#    src/qt/bittrex.cpp \
+#    src/qt/coinexchange.cpp \
+#    src/qt/yobit.cpp \
     src/qt/messagepage.cpp \
     src/qt/messagemodel.cpp \
     src/qt/sendmessagesdialog.cpp \
@@ -447,7 +462,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/blockbrowser.cpp \
     src/qt/qvalidatedtextedit.cpp \
     src/qt/plugins/mrichtexteditor/mrichtextedit.cpp \
-	src/qt/tradingdialog.cpp \
+    src/qt/tradingdialog.cpp \
     src/rpcsmessage.cpp \
     src/blake.c \
     src/bmw.c \
@@ -477,18 +492,18 @@ FORMS += \
     src/qt/forms/addeditadrenalinenode.ui \
     src/qt/forms/adrenalinenodeconfigdialog.ui \
 #    Uncomment to build SPL Adv
-    src/qt/forms/radio.ui \
-    src/qt/forms/bitcointalk.ui \
-    src/qt/forms/twitter.ui \
-    src/qt/forms/bittrex.ui \
-    src/qt/forms/coinexchange.ui \
-    src/qt/forms/yobit.ui \
+#    src/qt/forms/radio.ui \
+#    src/qt/forms/bitcointalk.ui \
+#    src/qt/forms/twitter.ui \
+#    src/qt/forms/bittrex.ui \
+#    src/qt/forms/coinexchange.ui \
+#    src/qt/forms/yobit.ui \
     src/qt/forms/messagepage.ui \
     src/qt/forms/sendmessagesentry.ui \
     src/qt/forms/sendmessagesdialog.ui \
     src/qt/forms/blockbrowser.ui \
     src/qt/forms/tradingdialog.ui \
-    src/qt/plugins/mrichtexteditor/mrichtextedit.ui 
+    src/qt/plugins/mrichtexteditor/mrichtextedit.ui
 
 contains(DEFINES, USE_NATIVE_I2P) {
 HEADERS += src/i2p.h \
@@ -537,17 +552,18 @@ OTHER_FILES += \
 # platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {
     macx:BOOST_LIB_SUFFIX = -mt
-    windows:BOOST_LIB_SUFFIX = -mt
+    windows:BOOST_LIB_SUFFIX=-mgw49-mt-s-1_57
 }
 
 isEmpty(BOOST_THREAD_LIB_SUFFIX) {
     BOOST_THREAD_LIB_SUFFIX = $$BOOST_LIB_SUFFIX
-    #win32:BOOST_THREAD_LIB_SUFFIX = _win32$$BOOST_LIB_SUFFIX
+    #win32:BOOST_THREAD_LIB_SUFFIX = $$BOOST_LIB_SUFFIX
     #else:BOOST_THREAD_LIB_SUFFIX = $$BOOST_LIB_SUFFIX
 }
 
 isEmpty(BDB_LIB_PATH) {
     macx:BDB_LIB_PATH = /usr/local/Cellar/berkeley-db4/4.8.30/lib
+    windows:BDB_LIB_PATH=C:/dev/coindeps32/bdb-4.8/lib
 }
 
 isEmpty(BDB_LIB_SUFFIX) {
@@ -556,14 +572,17 @@ isEmpty(BDB_LIB_SUFFIX) {
 
 isEmpty(BDB_INCLUDE_PATH) {
     macx:BDB_INCLUDE_PATH = /usr/local/Cellar/berkeley-db4/4.8.30/include
+    windows:BDB_INCLUDE_PATH=C:/dev/coindeps32/bdb-4.8/include
 }
 
 isEmpty(BOOST_LIB_PATH) {
-    macx:BOOST_LIB_PATH = /usr/local/Cellar/boost/1.58.0/lib
+    macx:BOOST_LIB_PATH = /usr/local/Cellar/boost/1.59.0/lib
+    windows:BOOST_LIB_PATH=C:/dev/coindeps32/boost_1_57_0/lib
 }
 
 isEmpty(BOOST_INCLUDE_PATH) {
-    macx:BOOST_INCLUDE_PATH = /usr/local/Cellar/boost/1.58.0/include
+    macx:BOOST_INCLUDE_PATH = /usr/local/Cellar/boost/1.59.0/include
+    windows:BOOST_INCLUDE_PATH=C:/dev/coindeps32/boost_1_57_0/include
 }
 
 isEmpty(QRENCODE_LIB_PATH) {
@@ -574,12 +593,45 @@ isEmpty(QRENCODE_INCLUDE_PATH) {
     macx:QRENCODE_INCLUDE_PATH = /usr/local/include
 }
 
-isEmpty(SECP256K1_LIB_PATH) {
-    macx:SECP256K1_LIB_PATH = /usr/local/lib
+isEmpty(MINIUPNPC_LIB_SUFFIX) {
+    windows:MINIUPNPC_LIB_SUFFIX=-miniupnpc
 }
 
-isEmpty(SECP256K1_INCLUDE_PATH) {
-    macx:SECP256K1_INCLUDE_PATH = /usr/local/include
+isEmpty(MINIUPNPC_INCLUDE_PATH) {
+    macx:MINIUPNPC_INCLUDE_PATH=/usr/local/Cellar/miniupnpc/1.9.20151008/include
+    windows:MINIUPNPC_INCLUDE_PATH=C:/dev/coindeps32/miniupnpc-1.9
+}
+
+isEmpty(MINIUPNPC_LIB_PATH) {
+    macx:MINIUPNPC_LIB_PATH=/usr/local/Cellar/miniupnpc/1.9.20151008/lib
+    windows:MINIUPNPC_LIB_PATH=C:/dev/coindeps32/miniupnpc-1.9
+}
+
+isEmpty(OPENSSL_INCLUDE_PATH) {
+    macx:OPENSSL_INCLUDE_PATH = /usr/local/openssl-1.0.1p/include
+    windows:OPENSSL_INCLUDE_PATH=C:/dev/coindeps32/openssl-1.0.1p/include
+}
+
+isEmpty(OPENSSL_LIB_PATH) {
+    macx:OPENSSL_LIB_PATH = /usr/local/openssl-1.0.1p/lib
+    windows:OPENSSL_LIB_PATH=C:/dev/coindeps32/openssl-1.0.1p/lib
+}
+
+# use: qmake "USE_UPNP=1" ( enabled by default; default)
+#  or: qmake "USE_UPNP=0" (disabled by default)
+#  or: qmake "USE_UPNP=-" (not supported)
+# miniupnpc (http://miniupnp.free.fr/files/) must be installed for support
+contains(USE_UPNP, -) {
+    message(Building without UPNP support)
+} else {
+    message(Building with UPNP support)
+    count(USE_UPNP, 0) {
+        USE_UPNP=1
+    }
+    DEFINES += USE_UPNP=$$USE_UPNP MINIUPNP_STATICLIB STATICLIB
+    INCLUDEPATH += $$MINIUPNPC_INCLUDE_PATH
+    LIBS += $$join(MINIUPNPC_LIB_PATH,,-L,) -lminiupnpc
+    win32:LIBS += -liphlpapi
 }
 
 windows:DEFINES += WIN32
@@ -608,12 +660,17 @@ macx:QMAKE_CXXFLAGS_THREAD += -pthread
 macx:QMAKE_INFO_PLIST = share/qt/Info.plist
 
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
-INCLUDEPATH += $$SECP256K1_INCLUDE_PATH $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
-LIBS += $$join(SECP256K1_LIB_PATH,,-L,) $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
+INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
+LIBS += $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
 LIBS += -lssl -lcrypto -ldb_cxx$$BDB_LIB_SUFFIX
 # -lgdi32 has to happen after -lcrypto (see  #681)
 windows:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
-LIBS += -lsecp256k1
+!windows: {
+    LIBS += -lgmp
+} else {
+    INCLUDEPATH += $$SECP256K1_INCLUDE_PATH
+    LIBS += $$join(SECP256K1_LIB_PATH,,-L,) -lsecp256k1
+}
 LIBS += -lboost_system$$BOOST_LIB_SUFFIX -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX
 windows:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
 

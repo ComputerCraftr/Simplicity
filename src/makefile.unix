@@ -157,18 +157,18 @@ OBJS= \
     obj/crypto/sha1.o \
     obj/crypto/sha256.o \
     obj/crypto/sha512.o \
-    obj/smessage.o    \
+    obj/smessage.o \
     obj/cubehash.o \
     obj/luffa.o \
     obj/aes_helper.o \
     obj/echo.o \
     obj/shavite.o \
     obj/simd.o \
-    obj/blake.o\
-    obj/bmw.o\
-    obj/groestl.o\
-    obj/jh.o\
-    obj/keccak.o\
+    obj/blake.o \
+    obj/bmw.o \
+    obj/groestl.o \
+    obj/jh.o \
+    obj/keccak.o \
     obj/skein.o
 
 ifdef USE_NATIVE_I2P

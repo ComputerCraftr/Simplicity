@@ -7,12 +7,12 @@
 #include <stdint.h>
 
 // Uncomment to build SPL Adv
-#include "radio.h"
-#include "bitcointalk.h"
-#include "twitter.h"
-#include "bittrex.h"
-#include "coinexchange.h"
-#include "yobit.h"
+//#include "radio.h"
+//#include "bitcointalk.h"
+//#include "twitter.h"
+//#include "bittrex.h"
+//#include "coinexchange.h"
+//#include "yobit.h"
 
 class TransactionTableModel;
 class ClientModel;
@@ -91,12 +91,12 @@ private:
     MasternodeManager *masternodeManagerPage;
     MessagePage *messagePage;
     // Uncomment to build SPL Adv
-    Radio *radioPage;
-    Bitcointalk *bitcointalkPage;
-    Twitter *twitterPage;
-    Bittrex *bittrexPage;
-    Coinexchange *coinexchangePage;
-    Yobit *yobitPage;
+    //Radio *radioPage;
+    //Bitcointalk *bitcointalkPage;
+    //Twitter *twitterPage;
+    //Bittrex *bittrexPage;
+    //Coinexchange *coinexchangePage;
+    //Yobit *yobitPage;
 
     QLabel* netLabel;
     BlockBrowser *blockBrowser;
@@ -137,12 +137,12 @@ private:
     QAction *messageAction;
     QAction *blockAction;
     // Uncomment to build SPL Adv
-    QAction *radioAction;
-    QAction *bitcointalkAction;
-    QAction *twitterAction;
-    QAction *bittrexAction;
-    QAction *coinexchangeAction;
-    QAction *yobitAction;
+    //QAction *radioAction;
+    //QAction *bitcointalkAction;
+    //QAction *twitterAction;
+    //QAction *bittrexAction;
+    //QAction *coinexchangeAction;
+    //QAction *yobitAction;
 
     QAction *TradingAction;
 
@@ -230,17 +230,17 @@ private slots:
     void gotoMessagePage();
     // Uncomment to build SPL Adv
     /** Switch to radio page */
-    void gotoRadioPage();
+    //void gotoRadioPage();
     /** Switch to bitcointalk page */
-    void gotoBitcointalkPage();
+    //void gotoBitcointalkPage();
     /** Switch to twitter page */
-    void gotoTwitterPage();
+    //void gotoTwitterPage();
     /** Switch to bittrex page */
-    void gotoBittrexPage();
+    //void gotoBittrexPage();
     /** Switch to coinexchange page */
-    void gotoCoinexchangePage();
+    //void gotoCoinexchangePage();
     /** Switch to yobit page */
-    void gotoYobitPage();
+    //void gotoYobitPage();
 
     /** Show configuration dialog */
     void optionsClicked();
