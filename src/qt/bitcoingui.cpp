@@ -316,7 +316,7 @@ void BitcoinGUI::createActions()
     overviewAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
     tabGroup->addAction(overviewAction);
 
-    receiveCoinsAction = new QAction(QIcon(":/icons/receive"), tr("&Receive"), this);
+    receiveCoinsAction = new QAction(QIcon(":/icons/receiving_addresses"), tr("&Receive"), this);
     receiveCoinsAction->setToolTip(tr("Show the list of addresses for receiving payments"));
     receiveCoinsAction->setCheckable(true);
     receiveCoinsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_2));
@@ -340,7 +340,7 @@ void BitcoinGUI::createActions()
     addressBookAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
     tabGroup->addAction(addressBookAction);
 
-    masternodeManagerAction = new QAction(QIcon(":/icons/simplicity"), tr("&Masternodes"), this);
+    masternodeManagerAction = new QAction(QIcon(":/icons/bitcoin"), tr("&Masternodes"), this);
     masternodeManagerAction->setToolTip(tr("Show masternode status and configure your nodes."));
     masternodeManagerAction->setCheckable(true);
     tabGroup->addAction(masternodeManagerAction);
