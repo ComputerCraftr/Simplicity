@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <inttypes.h>
 #include "util.h"
-
+#include "uint256.h"
 
 static const int SCRYPT_SCRATCHPAD_SIZE = 134218239;
 static const int N = 1048576;
