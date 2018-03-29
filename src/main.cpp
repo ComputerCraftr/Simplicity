@@ -1156,19 +1156,23 @@ int64_t GetProofOfWorkReward(int nHeight, int64_t nFees)
     int64_t nSubsidy = 100 * COIN;
     if (pindexBest->nHeight < 200)
     {
-        nSubsidy = 15000000 * COIN; // For Proccess Infrastucture Grounding Fund
+        nSubsidy = 15000000 * COIN; // For cheap MNs
     }
     else if (pindexBest->nHeight < 400)
     {
-        nSubsidy = 0 * COIN; // For Chain Movement
+        nSubsidy = 0 * COIN; // To provide chain stability
     }
     else if (pindexBest->nHeight < 2000)
     {
-        nSubsidy = 500 * COIN; // For 1'st Miners
+        nSubsidy = 500 * COIN; // Early bird gets the worm
     }
-    else if (pindexBest->nHeight > 2000)
+    else if (pindexBest->nHeight < 100000)
     {
-        nSubsidy = 100 * COIN; // For continued mining throughout
+        nSubsidy = 100 * COIN; // First come first serve
+    }
+	else if (pindexBest->nHeight > 100000)
+    {
+        nSubsidy = 10 * COIN; // Let's take a bite out of inflation
     }
 
     return nSubsidy + nFees;
@@ -1212,32 +1216,32 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
 
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
 
-//    if(pindexBest->nHeight >= HARD_FORK_BLOCK){
-//       if (nActualSpacing < 0){
-//            nActualSpacing = TARGET_SPACING_FORK;
-//        }
-//        if(nActualSpacing > TARGET_SPACING_FORK * 10){
-//            nActualSpacing = TARGET_SPACING_FORK * 10;
-//        }
-//    } else if(pindexBest->nHeight < HARD_FORK_BLOCK) {
+    if(pindexBest->nHeight >= HARD_FORK_BLOCK){
+        if (nActualSpacing < 0){
+            nActualSpacing = TARGET_SPACING_FORK;
+        }
+        // if(nActualSpacing > TARGET_SPACING_FORK * 10){
+            // nActualSpacing = TARGET_SPACING_FORK * 10;
+        // }
+    } else if (pindexBest->nHeight < HARD_FORK_BLOCK) {
         if (nActualSpacing < 0){
             nActualSpacing = TARGET_SPACING;
         }
-//    }
+    }
 
     // ppcoin: target change every block
     // ppcoin: retarget with exponential moving toward target spacing
     CBigNum bnNew;
     bnNew.SetCompact(pindexPrev->nBits);
-//    if(pindexBest->nHeight >= HARD_FORK_BLOCK){
-//        int64_t nInterval = nTargetTimespan / TARGET_SPACING_FORK;
-//        bnNew *= ((nInterval - 1) * TARGET_SPACING_FORK + nActualSpacing + nActualSpacing);
-//        bnNew /= ((nInterval + 1) * TARGET_SPACING_FORK);
-//    } else {
+    if(pindexBest->nHeight >= HARD_FORK_BLOCK){
+        int64_t nInterval = nTargetTimespan / TARGET_SPACING_FORK;
+        bnNew *= ((nInterval - 1) * TARGET_SPACING_FORK + nActualSpacing + nActualSpacing);
+        bnNew /= ((nInterval + 1) * TARGET_SPACING_FORK);
+    } else {
         int64_t nInterval = nTargetTimespan / TARGET_SPACING;
         bnNew *= ((nInterval - 1) * TARGET_SPACING + nActualSpacing + nActualSpacing);
         bnNew /= ((nInterval + 1) * TARGET_SPACING);
-//    }
+    }
 
     if (bnNew <= 0 || bnNew > bnTargetLimit)
         bnNew = bnTargetLimit;

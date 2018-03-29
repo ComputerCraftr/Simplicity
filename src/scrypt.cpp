@@ -38,9 +38,6 @@
 
 #define SCRYPT_BUFFER_SIZE (131072 + 63)
 
-#if defined (OPTIMIZED_SALSA) && ( defined (__x86_64__) || defined (__i386__) || defined(__arm__) )
-extern "C" void scrypt_core(unsigned int *X, unsigned int *V);
-#else
 // Generic scrypt_core implementation
 
 static inline void xor_salsa8(unsigned int B[16], const unsigned int Bx[16])
@@ -128,8 +125,6 @@ static inline void scrypt_core(unsigned int *X, unsigned int *V)
         xor_salsa8(&X[16], &X[0]);
     }
 }
-
-#endif
 
 /* cpu and memory intensive function to transform a 80 byte buffer into a 32 byte output
    scratchpad size needs to be at least 63 + (128 * r * p) + (256 * r + 64) + (128 * r * N) bytes

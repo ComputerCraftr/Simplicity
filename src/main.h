@@ -11,7 +11,7 @@
 #include "txmempool.h"
 #include "net.h"
 #include "script.h"
-#include "scrypt.h"
+#include "scrypt2.h"
 #include "hashblock.h"
 
 #include <list>
@@ -83,11 +83,15 @@ static const int64_t MIN_TX_FEE = 1000000; // 0.01 per kb
 /** Fees smaller than this (in satoshi) are considered zero fee (for relaying) */
 static const int64_t MIN_RELAY_TX_FEE = MIN_TX_FEE;
 /** No amount larger than this (in satoshi) is valid */
-static const int64_t MAX_MONEY = 21000000000 * COIN; // 21 Billion
+static const int64_t MAX_MONEY = 6000000000 * COIN; // 6 Billion
 /** This is the amount in % to which is returned yearly in interest */
 static const int64_t COIN_YEAR_REWARD = 22.38 * CENT; // 22.38% Per Year
 /** This is the block target time for PoW/PoS mining */
 static const int64_t TARGET_SPACING = 1 * 80; // 80 second block time expected
+/** The new block target time after the hard fork */
+static const int64_t TARGET_SPACING_FORK = 1 * 60;
+/** The block at which the hard fork will be executed */
+static const int64_t HARD_FORK_BLOCK = 100000;
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 /** Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp. */
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
@@ -633,7 +637,7 @@ class CBlock
 {
 public:
     // header
-    static const int CURRENT_VERSION = 7;
+    static const int CURRENT_VERSION = 8;
     int nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;
@@ -711,7 +715,14 @@ public:
 
     uint256 GetPoWHash() const
     {
-        return Hash9(BEGIN(nVersion), END(nNonce));
+		if (nVersion > 7)
+		{
+			uint256 thash;
+			scryptHash(BEGIN(nVersion), BEGIN(thash));
+			return thash;
+		}
+		else
+			return Hash9(BEGIN(nVersion), END(nNonce));
     }
 
     int64_t GetBlockTime() const
