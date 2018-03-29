@@ -1233,15 +1233,19 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
     // ppcoin: retarget with exponential moving toward target spacing
     CBigNum bnNew;
     bnNew.SetCompact(pindexPrev->nBits);
-    if(pindexBest->nHeight >= HARD_FORK_BLOCK){
-        int64_t nInterval = nTargetTimespan / TARGET_SPACING_FORK;
-        bnNew *= ((nInterval - 1) * TARGET_SPACING_FORK + nActualSpacing + nActualSpacing);
-        bnNew /= ((nInterval + 1) * TARGET_SPACING_FORK);
-    } else {
-        int64_t nInterval = nTargetTimespan / TARGET_SPACING;
-        bnNew *= ((nInterval - 1) * TARGET_SPACING + nActualSpacing + nActualSpacing);
-        bnNew /= ((nInterval + 1) * TARGET_SPACING);
-    }
+	if (pindexBest->nHeight >= HARD_FORK_BLOCK) // Need to cut difficulty for CPU mining
+	{
+		int64_t nInterval = nTargetTimespan / TARGET_SPACING_FORK;
+		bnNew *= ((nInterval - 1) * TARGET_SPACING_FORK + nActualSpacing + nActualSpacing);
+		bnNew /= ((nInterval + 1) * TARGET_SPACING_FORK);
+		if (pindexBest->nHeight < (HARD_FORK_BLOCK+10))
+			bnNew /= pow(4.0, (double)(HARD_FORK_BLOCK+10-pindexBest->nHeight));
+			// bnNew /= (HARD_FORK_BLOCK+100-pindexBest->nHeight)*1000;
+	} else {
+		int64_t nInterval = nTargetTimespan / TARGET_SPACING;
+		bnNew *= ((nInterval - 1) * TARGET_SPACING + nActualSpacing + nActualSpacing);
+		bnNew /= ((nInterval + 1) * TARGET_SPACING);
+	}
 
     if (bnNew <= 0 || bnNew > bnTargetLimit)
         bnNew = bnTargetLimit;
