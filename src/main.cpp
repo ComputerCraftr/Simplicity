@@ -1166,11 +1166,11 @@ int64_t GetProofOfWorkReward(int nHeight, int64_t nFees)
     {
         nSubsidy = 500 * COIN; // Early bird gets the worm
     }
-    else if (pindexBest->nHeight < 100000)
+    else if (pindexBest->nHeight < HARD_FORK_BLOCK)
     {
         nSubsidy = 100 * COIN; // First come first serve
     }
-	else if (pindexBest->nHeight > 100000)
+	else if (pindexBest->nHeight >= HARD_FORK_BLOCK)
     {
         nSubsidy = 10 * COIN; // Let's take a bite out of inflation
     }
@@ -1216,14 +1216,15 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
 
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
 
-    if(pindexBest->nHeight >= HARD_FORK_BLOCK){
+	int blockHeight = pindexBest->nHeight;
+    if(blockHeight >= HARD_FORK_BLOCK){
         if (nActualSpacing < 0){
             nActualSpacing = TARGET_SPACING_FORK;
         }
         // if(nActualSpacing > TARGET_SPACING_FORK * 10){
             // nActualSpacing = TARGET_SPACING_FORK * 10;
         // }
-    } else if (pindexBest->nHeight < HARD_FORK_BLOCK) {
+    } else if (blockHeight < HARD_FORK_BLOCK) {
         if (nActualSpacing < 0){
             nActualSpacing = TARGET_SPACING;
         }
@@ -1233,14 +1234,13 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
     // ppcoin: retarget with exponential moving toward target spacing
     CBigNum bnNew;
     bnNew.SetCompact(pindexPrev->nBits);
-	if (pindexBest->nHeight >= HARD_FORK_BLOCK) // Need to cut difficulty for CPU mining
+	if (blockHeight >= HARD_FORK_BLOCK) // Need to cut difficulty for CPU mining
 	{
 		int64_t nInterval = nTargetTimespan / TARGET_SPACING_FORK;
 		bnNew *= ((nInterval - 1) * TARGET_SPACING_FORK + nActualSpacing + nActualSpacing);
 		bnNew /= ((nInterval + 1) * TARGET_SPACING_FORK);
-		if (pindexBest->nHeight < (HARD_FORK_BLOCK+10))
-			bnNew /= pow(4.0, (double)(HARD_FORK_BLOCK+10-pindexBest->nHeight));
-			// bnNew /= (HARD_FORK_BLOCK+100-pindexBest->nHeight)*1000;
+		if (blockHeight < (HARD_FORK_BLOCK+10))
+			bnNew /= (int)pow(4.0, (double)(blockHeight));
 	} else {
 		int64_t nInterval = nTargetTimespan / TARGET_SPACING;
 		bnNew *= ((nInterval - 1) * TARGET_SPACING + nActualSpacing + nActualSpacing);

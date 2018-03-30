@@ -707,10 +707,7 @@ public:
 
     uint256 GetHash() const
     {
-        if (nVersion > 6)
-            return Hash(BEGIN(nVersion), END(nNonce));
-        else
-            return GetPoWHash();
+        return Hash(BEGIN(nVersion), END(nNonce));
     }
 
     uint256 GetPoWHash() const
