@@ -782,7 +782,7 @@ bool CTransaction::CheckTransaction() const
     return true;
 }
 
-int64_t GetMinFee(const CTransaction& tx, unsigned int nBytes, bool fAllowFree, enum GetMinFee_mode mode)
+int64_t GetMinFee(const CTransaction& tx, unsigned int nBytes, /*bool fAllowFree,*/ enum GetMinFee_mode mode)
 {
     // Base fee is either MIN_TX_FEE or MIN_RELAY_TX_FEE
     int64_t nBaseFee = (mode == GMF_RELAY) ? MIN_RELAY_TX_FEE : MIN_TX_FEE;
@@ -918,11 +918,11 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
 
         // Don't accept it if it can't get into a block
         // but prioritise dstx and don't check fees for it
-        if(mapDarksendBroadcastTxes.count(hash)) {
+        //if(mapDarksendBroadcastTxes.count(hash)) {
             // Normally we would PrioritiseTransaction But currently it is unimplemented
             // mempool.PrioritiseTransaction(hash, hash.ToString(), 1000, 0.1*COIN);
-        } else if(!ignoreFees){
-            int64_t txMinFee = GetMinFee(tx, nSize, true, GMF_RELAY);
+        //} else if(!ignoreFees){
+            int64_t txMinFee = GetMinFee(tx, nSize, /*true,*/ GMF_RELAY);
             if (fLimitFree && nFees < txMinFee)
                 return error("AcceptToMemoryPool : not enough fees %s, %d < %d",
                             hash.ToString(),
@@ -950,7 +950,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
                 LogPrint("mempool", "Rate limit dFreeCount: %g => %g\n", dFreeCount, dFreeCount+nSize);
                 dFreeCount += nSize;
             }
-        }
+        //}
 
         if (fRejectInsaneFee && nFees > MIN_RELAY_TX_FEE * 10000)
             return error("AcceptableInputs: : insane fees %s, %d > %d",
@@ -1077,13 +1077,13 @@ bool AcceptableInputs(CTxMemPool& pool, const CTransaction &txo, bool fLimitFree
 
         int64_t nFees = tx.GetValueIn(mapInputs)-tx.GetValueOut();
         unsigned int nSize = ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
-        int64_t txMinFee = GetMinFee(tx, nSize, true, GMF_RELAY);
+        int64_t txMinFee = GetMinFee(tx, nSize, /*true,*/ GMF_RELAY);
 
         // Don't accept it if it can't get into a block
-        if(isDSTX) {
+        //if(isDSTX) {
             // Normally we would PrioritiseTransaction But currently it is unimplemented
             // mempool.PrioritiseTransaction(hash, hash.ToString(), 1000, 0.1*COIN);
-        } else { // same as !ignoreFees for AcceptToMemoryPool
+        //} else { // same as !ignoreFees for AcceptToMemoryPool
             if (fLimitFree && nFees < txMinFee)
                 return error("AcceptableInputs : not enough fees %s, %d < %d",
                             hash.ToString(),
@@ -1111,7 +1111,7 @@ bool AcceptableInputs(CTxMemPool& pool, const CTransaction &txo, bool fLimitFree
                 LogPrint("mempool", "Rate limit dFreeCount: %g => %g\n", dFreeCount, dFreeCount+nSize);
                 dFreeCount += nSize;
             }
-        }
+        //}
 
         if (fRejectInsaneFee && nFees > txMinFee * 10000)
             return error("AcceptableInputs: : insane fees %s, %d > %d",
@@ -1839,6 +1839,12 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
             int64_t nTxFee = nValueIn - GetValueOut();
             if (nTxFee < 0)
                 return DoS(100, error("ConnectInputs() : %s nTxFee < 0", GetHash().ToString()));
+
+            // enforce transaction fees for every block
+            unsigned int txSize = ::GetSerializeSize(*this, SER_NETWORK, PROTOCOL_VERSION);
+            int64_t nRequiredFee = GetMinFee(*this, txSize, GMF_RELAY);
+            if (nTxFee < nRequiredFee)
+                return fBlock? DoS(100, error("ConnectInputs() : %s not paying required fee=%s, paid=%s", GetHash().ToString(), FormatMoney(nRequiredFee), FormatMoney(nTxFee))) : false;
 
             nFees += nTxFee;
             if (!MoneyRange(nFees))
