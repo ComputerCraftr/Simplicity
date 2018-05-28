@@ -10,7 +10,6 @@
 #include "init.h"
 #include "net.h"
 #include "netbase.h"
-#include "timedata.h"
 #include "util.h"
 #include "wallet.h"
 #include "walletdb.h"
@@ -860,7 +859,7 @@ Value movecmd(const Array& params, bool fHelp)
     credit.nTime = nNow;
     credit.strOtherAccount = strFrom;
     credit.strComment = strComment;
-    pwalletMain->AddAccountingEntry(debit, walletdb);
+    pwalletMain->AddAccountingEntry(credit, walletdb);
 
     if (!walletdb.TxnCommit())
         throw JSONRPCError(RPC_DATABASE_ERROR, "database error");
@@ -1879,9 +1878,9 @@ Value keypoolrefill(const Array& params, bool fHelp)
     unsigned int nSize;
 
     if (fLiteMode)
-        nSize = max(GetArg("-keypool", 1000), (int64_t)0);
-    else
         nSize = max(GetArg("-keypool", 100), (int64_t)0);
+    else
+        nSize = max(GetArg("-keypool", 10), (int64_t)0);
 
     if (params.size() > 0) {
         if (params[0].get_int() < 0)
