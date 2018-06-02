@@ -39,8 +39,11 @@ sudo apt install build-essential libtool autotools-dev automake pkg-config libss
 sudo apt install qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools libqt5webkit5 build-essential libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libgmp-dev libminiupnpc-dev
 
 sudo apt install software-properties-common
+
 sudo add-apt-repository ppa:bitcoin/bitcoin
+
 sudo apt update
+
 sudo apt install libdb4.8-dev libdb4.8++-dev
 
 sudo apt install libqrencode-dev
@@ -80,8 +83,11 @@ sudo apt install build-essential libtool autotools-dev automake pkg-config libss
 sudo apt install qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools libqt5webkit5 build-essential libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev 
 
 sudo apt install software-properties-common
+
 sudo add-apt-repository ppa:bitcoin/bitcoin
+
 sudo apt update
+
 sudo apt install libdb4.8-dev libdb4.8++-dev
 
 sudo apt-get install libqrencode-dev
