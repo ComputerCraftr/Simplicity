@@ -1,12 +1,13 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) 2009-2014 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "assert.h"
-
 #include "chainparams.h"
-#include "main.h"
+
+#include "assert.h"
+#include "core.h"
+#include "protocol.h"
 #include "util.h"
 
 #include <boost/assign/list_of.hpp>
@@ -73,7 +74,6 @@ public:
         genesis.nNonce   = 561379;
 
         hashGenesisBlock = genesis.GetHash();
-
         assert(hashGenesisBlock == uint256("0xf4bbfc518aa3622dbeb8d2818a606b82c2b8b1ac2f28553ebdb6fc04d7abaccf"));
         assert(genesis.hashMerkleRoot == uint256("0x40bdd3d5ae84b91a71190094a82948400eb3356e87c5376b64d79509cf552d84"));
 
@@ -109,7 +109,6 @@ static CMainParams mainParams;
 //
 // Testnet
 //
-
 class CTestNetParams : public CMainParams {
 public:
     CTestNetParams() {

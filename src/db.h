@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) 2009-2013 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -18,11 +18,9 @@
 #include <db_cxx.h>
 
 class CAddrMan;
-class CBlockLocator;
+struct CBlockLocator;
 class CDiskBlockIndex;
-class CDiskTxPos;
 class COutPoint;
-class CTxIndex;
 
 extern unsigned int nWalletDBUpdated;
 
@@ -34,8 +32,7 @@ class CDBEnv
 private:
     bool fDbEnvInit;
     bool fMockDb;
-    boost::filesystem::path pathEnv;
-    std::string strPath;
+    boost::filesystem::path path;
 
     void EnvShutdown();
 
@@ -48,7 +45,7 @@ public:
     CDBEnv();
     ~CDBEnv();
     void MakeMock();
-    bool IsMock() { return fMockDb; };
+    bool IsMock() { return fMockDb; }
 
     /*
      * Verify that database file strFile is OK. If it is not,
@@ -68,10 +65,10 @@ public:
     typedef std::pair<std::vector<unsigned char>, std::vector<unsigned char> > KeyValPair;
     bool Salvage(std::string strFile, bool fAggressive, std::vector<KeyValPair>& vResult);
 
-    bool Open(boost::filesystem::path pathEnv_);
+    bool Open(const boost::filesystem::path &path);
     void Close();
     void Flush(bool fShutdown);
-    void CheckpointLSN(const std::string& strFile);
+    void CheckpointLSN(std::string strFile);
 
     void CloseDb(const std::string& strFile);
     bool RemoveDb(const std::string& strFile);
@@ -98,12 +95,11 @@ protected:
     DbTxn *activeTxn;
     bool fReadOnly;
 
-    explicit CDB(const std::string& strFilename, const char* pszMode="r+");
+    explicit CDB(const char* pszFile, const char* pszMode="r+");
     ~CDB() { Close(); }
-
 public:
+    void Flush();
     void Close();
-
 private:
     CDB(const CDB&);
     void operator=(const CDB&);

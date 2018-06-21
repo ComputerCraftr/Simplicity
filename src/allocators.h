@@ -1,17 +1,18 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) 2009-2013 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#ifndef TRANSFER_ALLOCATORS_H
-#define TRANSFER_ALLOCATORS_H
 
-#include "support/cleanse.h"
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/once.hpp>
+#ifndef BITCOIN_ALLOCATORS_H
+#define BITCOIN_ALLOCATORS_H
+
 #include <map>
 #include <string>
 #include <string.h>
 
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/once.hpp>
+#include <openssl/crypto.h> // for OPENSSL_cleanse()
 
 /**
  * Thread-safe class to keep track of locked (ie, non-swappable) memory pages.
@@ -39,6 +40,7 @@ public:
     {
         assert(this->GetLockedPageCount() == 0);
     }
+
 
     // For all pages in affected range, increase lock count
     void LockRange(void *p, size_t size)
@@ -167,7 +169,7 @@ template<typename T> void LockObject(const T &t) {
 }
 
 template<typename T> void UnlockObject(const T &t) {
-    memory_cleanse((void*)(&t), sizeof(T));
+    OPENSSL_cleanse((void*)(&t), sizeof(T));
     LockedPageManager::Instance().UnlockRange((void*)(&t), sizeof(T));
 }
 
@@ -208,7 +210,7 @@ struct secure_allocator : public std::allocator<T>
     {
         if (p != NULL)
         {
-            memory_cleanse(p, sizeof(T) * n);
+            OPENSSL_cleanse(p, sizeof(T) * n);
             LockedPageManager::Instance().UnlockRange(p, sizeof(T) * n);
         }
         std::allocator<T>::deallocate(p, n);
@@ -242,7 +244,7 @@ struct zero_after_free_allocator : public std::allocator<T>
     void deallocate(T* p, std::size_t n)
     {
         if (p != NULL)
-            memory_cleanse(p, sizeof(T) * n);
+            OPENSSL_cleanse(p, sizeof(T) * n);
         std::allocator<T>::deallocate(p, n);
     }
 };

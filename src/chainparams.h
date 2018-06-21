@@ -8,7 +8,6 @@
 
 #include "bignum.h"
 #include "uint256.h"
-#include "util.h"
 
 #include <vector>
 
@@ -71,7 +70,7 @@ public:
     int PoolMaxTransactions() const { return nPoolMaxTransactions; }
     std::string DarksendPoolDummyAddress() const { return strDarksendPoolDummyAddress; }
 protected:
-    CChainParams() {};
+    CChainParams() {}
 
     uint256 hashGenesisBlock;
     MessageStartChars pchMessageStart;

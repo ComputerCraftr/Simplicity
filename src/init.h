@@ -6,22 +6,29 @@
 #ifndef BITCOIN_INIT_H
 #define BITCOIN_INIT_H
 
-#include "wallet.h"
 #include <string>
 
 class CWallet;
 
 namespace boost {
     class thread_group;
-} // namespace boost
+};
 
+extern std::string strWalletFile;
 extern CWallet* pwalletMain;
 
 void StartShutdown();
 bool ShutdownRequested();
 void Shutdown();
 bool AppInit2(boost::thread_group& threadGroup);
-std::string HelpMessage();
-extern bool fOnlyTor;
+
+/* The help message mode determines what help message to show */
+enum HelpMessageMode
+{
+    HMM_BITCOIND,
+    HMM_BITCOIN_QT
+};
+
+std::string HelpMessage(HelpMessageMode mode);
 
 #endif

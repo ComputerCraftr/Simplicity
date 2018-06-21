@@ -1,16 +1,15 @@
-//
-// Alert system
-//
+// Copyright (c) 2010 Satoshi Nakamoto
+// Copyright (c) 2009-2014 The Bitcoin developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "alert.h"
 
-#include "chainparams.h"
-#include "pubkey.h"
+#include "key.h"
 #include "net.h"
 #include "ui_interface.h"
 #include "util.h"
 
-#include <stdint.h>
 #include <algorithm>
 #include <map>
 
@@ -78,6 +77,11 @@ std::string CUnsignedAlert::ToString() const
         strStatusBar);
 }
 
+void CUnsignedAlert::print() const
+{
+    LogPrintf("%s", ToString());
+}
+
 void CAlert::SetNull()
 {
     CUnsignedAlert::SetNull();
@@ -123,9 +127,6 @@ bool CAlert::AppliesToMe() const
 bool CAlert::RelayTo(CNode* pnode) const
 {
     if (!IsInEffect())
-        return false;
-    // don't relay to nodes which haven't sent their version message
-    if (pnode->nVersion == 0)
         return false;
     // returns true if wasn't already contained in the set
     if (pnode->setKnown.insert(GetHash()).second)
