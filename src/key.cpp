@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "key.h"
+#include "util.h"
 
 #include <openssl/bn.h>
 #include <openssl/ecdsa.h>
@@ -360,7 +361,7 @@ bool CKey::Check(const unsigned char *vch) {
 
 void CKey::MakeNewKey(bool fCompressedIn) {
     do {
-        RAND_bytes(vch, sizeof(vch));
+        GetRandBytes(vch, sizeof(vch));
     } while (!Check(vch));
     fValid = true;
     fCompressed = fCompressedIn;

@@ -259,19 +259,19 @@ public:
  * Script-hash-addresses have version 5 (or 196 testnet).
  * The data vector contains RIPEMD160(SHA256(cscript)), where cscript is the serialized redemption script.
  */
-class CBitcoinAddress;
-class CBitcoinAddressVisitor : public boost::static_visitor<bool>
+class CSimplicityAddress;
+class CSimplicityAddressVisitor : public boost::static_visitor<bool>
 {
 private:
-    CBitcoinAddress *addr;
+    CSimplicityAddress *addr;
 public:
-    CBitcoinAddressVisitor(CBitcoinAddress *addrIn) : addr(addrIn) { }
+    CSimplicityAddressVisitor(CSimplicityAddress *addrIn) : addr(addrIn) { }
     bool operator()(const CKeyID &id) const;
     bool operator()(const CScriptID &id) const;
     bool operator()(const CNoDestination &no) const;
 };
 
-class CBitcoinAddress : public CBase58Data
+class CSimplicityAddress : public CBase58Data
 {
 public:
     bool Set(const CKeyID &id) {
@@ -286,7 +286,7 @@ public:
 
     bool Set(const CTxDestination &dest)
     {
-        return boost::apply_visitor(CBitcoinAddressVisitor(this), dest);
+        return boost::apply_visitor(CSimplicityAddressVisitor(this), dest);
     }
 
     bool IsValid() const
@@ -297,21 +297,21 @@ public:
         return fCorrectSize && fKnownVersion;
     }
 
-    CBitcoinAddress()
+    CSimplicityAddress()
     {
     }
 
-    CBitcoinAddress(const CTxDestination &dest)
+    CSimplicityAddress(const CTxDestination &dest)
     {
         Set(dest);
     }
 
-    CBitcoinAddress(const std::string& strAddress)
+    CSimplicityAddress(const std::string& strAddress)
     {
         SetString(strAddress);
     }
 
-    CBitcoinAddress(const char* pszAddress)
+    CSimplicityAddress(const char* pszAddress)
     {
         SetString(pszAddress);
     }
@@ -343,12 +343,12 @@ public:
     }
 };
 
-bool inline CBitcoinAddressVisitor::operator()(const CKeyID &id) const         { return addr->Set(id); }
-bool inline CBitcoinAddressVisitor::operator()(const CScriptID &id) const      { return addr->Set(id); }
-bool inline CBitcoinAddressVisitor::operator()(const CNoDestination &id) const { return false; }
+bool inline CSimplicityAddressVisitor::operator()(const CKeyID &id) const         { return addr->Set(id); }
+bool inline CSimplicityAddressVisitor::operator()(const CScriptID &id) const      { return addr->Set(id); }
+bool inline CSimplicityAddressVisitor::operator()(const CNoDestination &id) const { return false; }
 
 /** A base58-encoded secret key */
-class CBitcoinSecret : public CBase58Data
+class CSimplicitySecret : public CBase58Data
 {
 public:
     void SetKey(const CKey& vchSecret)
@@ -383,18 +383,18 @@ public:
         return SetString(strSecret.c_str());
     }
 
-    CBitcoinSecret(const CKey& vchSecret)
+    CSimplicitySecret(const CKey& vchSecret)
     {
         SetKey(vchSecret);
     }
 
-    CBitcoinSecret()
+    CSimplicitySecret()
     {
     }
 };
 
 
-template<typename K, int Size, CChainParams::Base58Type Type> class CBitcoinExtKeyBase : public CBase58Data
+template<typename K, int Size, CChainParams::Base58Type Type> class CSimplicityExtKeyBase : public CBase58Data
 {
 public:
     void SetKey(const K &key) {
@@ -409,14 +409,14 @@ public:
         return ret;
     }
 
-    CBitcoinExtKeyBase(const K &key) {
+    CSimplicityExtKeyBase(const K &key) {
         SetKey(key);
     }
 
-    CBitcoinExtKeyBase() {}
+    CSimplicityExtKeyBase() {}
 };
 
-typedef CBitcoinExtKeyBase<CExtKey, 74, CChainParams::EXT_SECRET_KEY> CBitcoinExtKey;
-typedef CBitcoinExtKeyBase<CExtPubKey, 74, CChainParams::EXT_PUBLIC_KEY> CBitcoinExtPubKey;
+typedef CSimplicityExtKeyBase<CExtKey, 74, CChainParams::EXT_SECRET_KEY> CSimplicityExtKey;
+typedef CSimplicityExtKeyBase<CExtPubKey, 74, CChainParams::EXT_PUBLIC_KEY> CSimplicityExtPubKey;
 
 #endif // BITCOIN_BASE58_H
