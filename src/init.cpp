@@ -51,6 +51,7 @@ std::string strWalletFile;
 CWallet* pwalletMain;
 int nWalletBackups = 10;
 #endif
+unsigned int nDerivationMethodIndex;
 
 #ifdef WIN32
 // Win32 LevelDB doesn't use filedescriptors, and the ones used for
@@ -450,6 +451,8 @@ bool AppInit2(boost::thread_group& threadGroup)
 #endif
 
     // ********************************************************* Step 2: parameter interactions
+
+    nDerivationMethodIndex = 0;
 
     if (mapArgs.count("-bind")) {
         // when specifying an explicit binding address, you want to listen on it
