@@ -4,11 +4,7 @@
 
 #include "version.h"
 
-#include "tinyformat.h"
-
 #include <string>
-
-#include <boost/algorithm/string/join.hpp>
 
 // Name of client reported in the 'version' message. Report the same name
 // for both bitcoind and bitcoin-qt, to make it harder for attackers to
@@ -16,7 +12,7 @@
 const std::string CLIENT_NAME("SPL");
 
 // Client version number
-#define CLIENT_VERSION_SUFFIX ""
+#define CLIENT_VERSION_SUFFIX   "-beta"
 
 
 // The following part of the code determines the CLIENT_BUILD variable.
@@ -33,6 +29,11 @@ const std::string CLIENT_NAME("SPL");
 //   * otherwise, use v[maj].[min].[rev].[build]-unk
 // finally CLIENT_VERSION_SUFFIX is added
 
+// First, include build.h if requested
+#ifdef HAVE_BUILD_INFO
+#    include "build.h"
+#endif
+
 // git will put "#define GIT_ARCHIVE 1" on the next line inside archives. 
 //#define GIT_ARCHIVE 1
 #ifdef GIT_ARCHIVE
@@ -41,10 +42,10 @@ const std::string CLIENT_NAME("SPL");
 #endif
 
 #define BUILD_DESC_FROM_COMMIT(maj,min,rev,build,commit) \
-    "v" DO_STRINGIZE(maj) "." DO_STRINGIZE(min) "." DO_STRINGIZE(rev) "." DO_STRINGIZE(build) "-" commit
+    "v" DO_STRINGIZE(maj) "." DO_STRINGIZE(min) "." DO_STRINGIZE(rev) "." DO_STRINGIZE(build) "-g" commit
 
 #define BUILD_DESC_FROM_UNKNOWN(maj,min,rev,build) \
-    "v" DO_STRINGIZE(maj) "." DO_STRINGIZE(min) "." DO_STRINGIZE(rev) "." DO_STRINGIZE(build) ""
+    "v" DO_STRINGIZE(maj) "." DO_STRINGIZE(min) "." DO_STRINGIZE(rev) "." DO_STRINGIZE(build) "-unk"
 
 #ifndef BUILD_DESC
 #    ifdef GIT_COMMIT_ID

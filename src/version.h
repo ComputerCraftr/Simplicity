@@ -1,14 +1,12 @@
 // Copyright (c) 2012 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #ifndef BITCOIN_VERSION_H
 #define BITCOIN_VERSION_H
 
 #include "clientversion.h"
 
 #include <string>
-#include <vector>
 
 //
 // client versioning
@@ -25,15 +23,10 @@ extern const std::string CLIENT_BUILD;
 extern const std::string CLIENT_DATE;
 
 //
-// database format versioning
-//
-static const int DATABASE_VERSION = 70509;
-
-//
 // network protocol versioning
 //
 
-static const int PROTOCOL_VERSION = 70022;
+static const int PROTOCOL_VERSION = 70023;
 
 // initial proto version, to be increased after version/verack negotiation
 static const int INIT_PROTO_VERSION = 209;
@@ -49,7 +42,7 @@ static const int MIN_INSTANTX_PROTO_VERSION = 70021;
 // V1 - Last protocol version before update
 // V2 - Newest protocol version
 static const int MIN_MASTERNODE_PAYMENT_PROTO_VERSION_1 = 70019;
-static const int MIN_MASTERNODE_PAYMENT_PROTO_VERSION_2 = 70022;
+static const int MIN_MASTERNODE_PAYMENT_PROTO_VERSION_2 = 70023;
 
 // nTime field added to CAddress, starting with this version;
 // if possible, avoid requesting addresses nodes older than this

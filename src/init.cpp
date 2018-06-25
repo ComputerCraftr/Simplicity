@@ -522,6 +522,13 @@ bool AppInit2(boost::thread_group& threadGroup)
     if (GetBoolArg("-nodebug", false) || find(categories.begin(), categories.end(), string("0")) != categories.end())
         fDebug = false;
 
+    if(fDebug)
+    {
+        fDebugSmsg = true;
+    } else
+    {
+        fDebugSmsg = GetBoolArg("-debugsmsg", false);
+    }
     if (fLiteMode)
         fNoSmsg = true;
     else
